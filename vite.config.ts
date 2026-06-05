@@ -17,4 +17,6 @@ export default defineConfig({
         svgr(),
         tailwindcss(),
     ],
+
+    base: '/'
 })

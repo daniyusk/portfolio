@@ -21,25 +21,25 @@ The project presents Daniyusk's work, style and developer identity through a res
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Build for production:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Run lint:
 
 ```bash
-npm run lint
+pnpm lint
 ```
 
 ## Project Structure

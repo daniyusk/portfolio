@@ -86,14 +86,19 @@ export function Terminal({
                 </span>
             </div>
 
-            <div className="max-h-[min(46vh,28rem)] overflow-auto p-4 text-[0.72rem] leading-5 sm:p-5 sm:text-[0.8rem] sm:leading-6" tabIndex={0}>
+            <div
+                className="max-h-[min(46vh,28rem)] overflow-auto p-4 text-[0.72rem] leading-5 sm:p-5 sm:text-[0.8rem] sm:leading-6"
+                tabIndex={0}
+            >
                 <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 text-zinc-200">
                     <ChevronRight aria-hidden="true" className="mt-1 h-4 w-4 text-violet-400" />
                     <span className="min-w-0 break-words font-medium">{commandText}</span>
                 </div>
 
                 <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2.5">
-                    <span aria-hidden="true" className="select-none text-violet-500">~</span>
+                    <span aria-hidden="true" className="select-none text-violet-500">
+                        ~
+                    </span>
                     <span className="min-w-0 whitespace-pre-wrap break-words text-zinc-400">
                         <TerminalTyping
                             animate={animate}
@@ -115,9 +120,7 @@ function normalizeTerminalText(text: string) {
     while (lines[0]?.trim() === "") lines.shift()
     while (lines[lines.length - 1]?.trim() === "") lines.pop()
 
-    const indents = lines
-        .filter((line) => line.trim().length > 0)
-        .map((line) => line.match(/^\s*/)?.[0].length ?? 0)
+    const indents = lines.filter((line) => line.trim().length > 0).map((line) => line.match(/^\s*/)?.[0].length ?? 0)
     const smallestIndent = indents.length > 0 ? Math.min(...indents) : 0
 
     return lines.map((line) => line.slice(smallestIndent)).join("\n")

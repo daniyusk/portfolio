@@ -14,12 +14,7 @@ const lineVariantStyles: Record<TerminalLineVariant, string> = {
     output: "text-zinc-300",
 }
 
-export function TerminalLine({
-    marker,
-    children,
-    variant = "output",
-    className = "",
-}: TerminalLineProps) {
+export function TerminalLine({ marker, children, variant = "output", className = "" }: TerminalLineProps) {
     return (
         <div
             className={`
@@ -40,9 +35,7 @@ export function TerminalLine({
                 {marker}
             </span>
 
-            <span className="min-w-0 whitespace-pre-wrap break-words">
-                {children}
-            </span>
+            <span className="min-w-0 whitespace-pre-wrap break-words">{children}</span>
         </div>
     )
 }

@@ -61,7 +61,10 @@ export function ProfileTilt() {
             className="profile-figure relative mx-auto grid aspect-square w-full max-w-72 place-items-center [perspective:900px] sm:max-w-80 lg:max-w-96"
         >
             <span aria-hidden="true" className="absolute inset-[4%] rounded-full bg-violet-600/25 blur-3xl" />
-            <span aria-hidden="true" className="absolute inset-0 rounded-full border border-violet-300/15 [background:conic-gradient(from_120deg,transparent_0_18%,rgba(196,181,253,.75)_28%,transparent_38_66%,rgba(124,58,237,.65)_78%,transparent_88%)] p-px animate-[spin_18s_linear_infinite]" />
+            <span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full border border-violet-300/15 [background:conic-gradient(from_120deg,transparent_0_18%,rgba(196,181,253,.75)_28%,transparent_38_66%,rgba(124,58,237,.65)_78%,transparent_88%)] p-px animate-[spin_18s_linear_infinite]"
+            />
 
             <a
                 ref={cardRef}
@@ -88,7 +91,10 @@ export function ProfileTilt() {
                     </div>
                 )}
 
-                <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0a0712]/70 via-transparent to-white/10" />
+                <span
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-[#0a0712]/70 via-transparent to-white/10"
+                />
                 <span
                     ref={glareRef}
                     aria-hidden="true"

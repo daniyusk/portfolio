@@ -7,12 +7,7 @@ type TerminalTypingProps = {
     onFinish?: () => void
 }
 
-export function TerminalTyping({
-    text,
-    animate = true,
-    speed = 16,
-    onFinish,
-}: TerminalTypingProps) {
+export function TerminalTyping({ text, animate = true, speed = 16, onFinish }: TerminalTypingProps) {
     const [animatedText, setAnimatedText] = useState("")
     const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
         if (typeof window === "undefined" || !window.matchMedia) return false
@@ -72,9 +67,7 @@ export function TerminalTyping({
 
     return (
         <>
-            <span aria-live="polite">
-                {displayed}
-            </span>
+            <span aria-live="polite">{displayed}</span>
 
             <span
                 aria-hidden="true"

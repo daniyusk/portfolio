@@ -19,7 +19,12 @@ export function Home() {
             const timeline = gsap.timeline({ defaults: { ease: "power3.out" } })
             timeline
                 .fromTo("[data-hero-reveal]", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.75, stagger: 0.1 })
-                .fromTo(".profile-figure", { opacity: 0, x: 32, scale: 0.92 }, { opacity: 1, x: 0, scale: 1, duration: 0.9 }, "-=0.55")
+                .fromTo(
+                    ".profile-figure",
+                    { opacity: 0, x: 32, scale: 0.92 },
+                    { opacity: 1, x: 0, scale: 1, duration: 0.9 },
+                    "-=0.55",
+                )
         }, page)
 
         return () => context.revert()

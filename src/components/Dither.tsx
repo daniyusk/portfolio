@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 
@@ -103,13 +103,6 @@ function DitherPlane({ shouldAnimate }: { shouldAnimate: boolean }) {
     const targetMouse = useRef(new THREE.Vector2())
     const { viewport, size, gl } = useThree()
 
-    const uniforms = useMemo(() => ({
-        time: { value: 0 },
-        resolution: { value: new THREE.Vector2(1, 1) },
-        mousePos: { value: new THREE.Vector2(0, 0) },
-        waveColor: { value: new THREE.Color(0.22, 0.06, 0.55) },
-    }), [])
-
     useEffect(() => {
         if (!shouldAnimate) return
 
@@ -121,18 +114,23 @@ function DitherPlane({ shouldAnimate }: { shouldAnimate: boolean }) {
     }, [shouldAnimate])
 
     useEffect(() => {
+        const material = materialRef.current
+        if (!material) return
+
         const dpr = gl.getPixelRatio()
-        uniforms.resolution.value.set(size.width * dpr, size.height * dpr)
+        material.uniforms.resolution.value.set(size.width * dpr, size.height * dpr)
         if (targetMouse.current.lengthSq() === 0) {
             targetMouse.current.set(size.width * 0.72, size.height * 0.4)
-            uniforms.mousePos.value.copy(targetMouse.current)
+            material.uniforms.mousePos.value.copy(targetMouse.current)
         }
-    }, [gl, size, uniforms])
+    }, [gl, size])
 
     useFrame(({ clock }, delta) => {
-        if (!materialRef.current || !shouldAnimate) return
-        uniforms.time.value = clock.elapsedTime
-        uniforms.mousePos.value.lerp(targetMouse.current, Math.min(1, delta * 4))
+        const material = materialRef.current
+        if (!material || !shouldAnimate) return
+
+        material.uniforms.time.value = clock.elapsedTime
+        material.uniforms.mousePos.value.lerp(targetMouse.current, Math.min(1, delta * 4))
     })
 
     return (
@@ -141,7 +139,12 @@ function DitherPlane({ shouldAnimate }: { shouldAnimate: boolean }) {
             <shaderMaterial
                 ref={materialRef}
                 fragmentShader={fragmentShader}
-                uniforms={uniforms}
+                uniforms={{
+                    time: { value: 0 },
+                    resolution: { value: new THREE.Vector2(1, 1) },
+                    mousePos: { value: new THREE.Vector2(0, 0) },
+                    waveColor: { value: new THREE.Color(0.22, 0.06, 0.55) },
+                }}
                 vertexShader={vertexShader}
             />
         </mesh>
@@ -149,12 +152,15 @@ function DitherPlane({ shouldAnimate }: { shouldAnimate: boolean }) {
 }
 
 export function Dither() {
-    const [isPageVisible, setIsPageVisible] = useState(!document.hidden)
-    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+    const [isPageVisible, setIsPageVisible] = useState(() =>
+        typeof document !== "undefined" ? !document.hidden : true,
+    )
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+        typeof window !== "undefined" ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false,
+    )
 
     useEffect(() => {
         const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-        setPrefersReducedMotion(mediaQuery.matches)
 
         const handleMotionChange = (event: MediaQueryListEvent) => {
             setPrefersReducedMotion(event.matches)

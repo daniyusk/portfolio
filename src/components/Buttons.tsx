@@ -45,12 +45,7 @@ void main() {
 }
 `
 
-export function ButtonLink({
-    children,
-    className,
-    href,
-    variant = "primary",
-}: ButtonLinkProps) {
+export function ButtonLink({ children, className, href, variant = "primary" }: ButtonLinkProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null)
     const effectRef = useRef<HTMLSpanElement>(null)
 
@@ -59,93 +54,100 @@ export function ButtonLink({
         const effect = effectRef.current
         if (!anchor || !effect) return
 
-        const dpr = Math.min(window.devicePixelRatio || 1, 2)
-        const renderer = new Renderer({ alpha: true, antialias: true, dpr })
-        const gl = renderer.gl
-        gl.clearColor(0, 0, 0, 0)
-        gl.enable(gl.BLEND)
-        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+        try {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2)
+            const renderer = new Renderer({ alpha: true, antialias: true, dpr })
+            const gl = renderer.gl
+            if (!gl) return
 
-        const geometry = new Triangle(gl)
-        if (geometry.attributes.uv) delete geometry.attributes.uv
+            gl.clearColor(0, 0, 0, 0)
+            gl.enable(gl.BLEND)
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-        const program = new Program(gl, {
-            vertex: VERTEX_SHADER,
-            fragment: FRAGMENT_SHADER,
-            uniforms: {
-                uCenter: { value: [0, 0] },
-                uHalfSize: { value: [1, 1] },
-                uRadius: { value: 14 * dpr },
-                uAngle: { value: 2.4 },
-                uLineColor: { value: [1, 1, 1] },
-                uBaseColor: { value: [0.35, 0.2, 0.72] },
-                uIntensity: { value: 0 },
-                uThickness: { value: 1.2 * dpr },
-            },
-        })
-        const mesh = new Mesh(gl, { geometry, program })
-        effect.appendChild(gl.canvas)
+            const geometry = new Triangle(gl)
+            if (geometry.attributes.uv) delete geometry.attributes.uv
 
-        let width = 1
-        let height = 1
-        let targetAngle = 2.4
-        let angle = 2.4
-        let targetIntensity = 0
-        let intensity = 0
-        let animationFrame = 0
-        let lastTime = performance.now()
+            const program = new Program(gl, {
+                vertex: VERTEX_SHADER,
+                fragment: FRAGMENT_SHADER,
+                uniforms: {
+                    uCenter: { value: [0, 0] },
+                    uHalfSize: { value: [1, 1] },
+                    uRadius: { value: 14 * dpr },
+                    uAngle: { value: 2.4 },
+                    uLineColor: { value: [1, 1, 1] },
+                    uBaseColor: { value: [0.35, 0.2, 0.72] },
+                    uIntensity: { value: 0 },
+                    uThickness: { value: 1.2 * dpr },
+                },
+            })
+            const mesh = new Mesh(gl, { geometry, program })
+            effect.appendChild(gl.canvas)
 
-        const lineColor = new Color(variant === "primary" ? "#ffffff" : "#c4b5fd")
-        const baseColor = new Color(variant === "primary" ? "#7c3aed" : "#5b21b6")
-        program.uniforms.uLineColor.value = [lineColor.r, lineColor.g, lineColor.b]
-        program.uniforms.uBaseColor.value = [baseColor.r, baseColor.g, baseColor.b]
+            let width = 1
+            let height = 1
+            let targetAngle = 2.4
+            let angle = 2.4
+            let targetIntensity = 0
+            let intensity = 0
+            let animationFrame = 0
+            let lastTime = performance.now()
 
-        const resize = () => {
-            const rect = anchor.getBoundingClientRect()
-            width = rect.width
-            height = rect.height
-            renderer.setSize(width + 40, height + 40)
-            program.uniforms.uCenter.value = [(20 + width / 2) * dpr, (20 + height / 2) * dpr]
-            program.uniforms.uHalfSize.value = [(width / 2) * dpr, (height / 2) * dpr]
-            program.uniforms.uRadius.value = Math.min(14, height / 2) * dpr
-        }
+            const lineColor = new Color(variant === "primary" ? "#ffffff" : "#c4b5fd")
+            const baseColor = new Color(variant === "primary" ? "#7c3aed" : "#5b21b6")
+            program.uniforms.uLineColor.value = [lineColor.r, lineColor.g, lineColor.b]
+            program.uniforms.uBaseColor.value = [baseColor.r, baseColor.g, baseColor.b]
 
-        const handlePointerMove = (event: PointerEvent) => {
-            const rect = anchor.getBoundingClientRect()
-            const centerX = rect.left + rect.width / 2
-            const centerY = rect.top + rect.height / 2
-            const dx = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right)
-            const dy = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom)
-            const distance = Math.hypot(dx, dy)
-            const proximity = Math.max(0, 1 - distance / 240)
-            targetIntensity = proximity * proximity * 1.35
-            targetAngle = Math.atan2(centerY - event.clientY, event.clientX - centerX)
-        }
+            const resize = () => {
+                const rect = anchor.getBoundingClientRect()
+                width = rect.width
+                height = rect.height
+                renderer.setSize(width + 40, height + 40)
+                program.uniforms.uCenter.value = [(20 + width / 2) * dpr, (20 + height / 2) * dpr]
+                program.uniforms.uHalfSize.value = [(width / 2) * dpr, (height / 2) * dpr]
+                program.uniforms.uRadius.value = Math.min(14, height / 2) * dpr
+            }
 
-        const render = (now: number) => {
-            const delta = Math.min((now - lastTime) / 1000, 0.05)
-            lastTime = now
-            const difference = ((targetAngle - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
-            angle += difference * (1 - Math.exp(-delta * 9))
-            intensity += (targetIntensity - intensity) * (1 - Math.exp(-delta * 10))
-            program.uniforms.uAngle.value = angle
-            program.uniforms.uIntensity.value = intensity
-            renderer.render({ scene: mesh })
+            const handlePointerMove = (event: PointerEvent) => {
+                const rect = anchor.getBoundingClientRect()
+                const centerX = rect.left + rect.width / 2
+                const centerY = rect.top + rect.height / 2
+                const dx = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right)
+                const dy = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom)
+                const distance = Math.hypot(dx, dy)
+                const proximity = Math.max(0, 1 - distance / 240)
+                targetIntensity = proximity * proximity * 1.35
+                targetAngle = Math.atan2(centerY - event.clientY, event.clientX - centerX)
+            }
+
+            const render = (now: number) => {
+                const delta = Math.min((now - lastTime) / 1000, 0.05)
+                lastTime = now
+                const difference = ((targetAngle - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
+                angle += difference * (1 - Math.exp(-delta * 9))
+                intensity += (targetIntensity - intensity) * (1 - Math.exp(-delta * 10))
+                program.uniforms.uAngle.value = angle
+                program.uniforms.uIntensity.value = intensity
+                renderer.render({ scene: mesh })
+                animationFrame = requestAnimationFrame(render)
+            }
+
+            const observer = new ResizeObserver(resize)
+            observer.observe(anchor)
+            window.addEventListener("pointermove", handlePointerMove)
+            resize()
             animationFrame = requestAnimationFrame(render)
-        }
 
-        const observer = new ResizeObserver(resize)
-        observer.observe(anchor)
-        window.addEventListener("pointermove", handlePointerMove)
-        resize()
-        animationFrame = requestAnimationFrame(render)
-
-        return () => {
-            observer.disconnect()
-            window.removeEventListener("pointermove", handlePointerMove)
-            cancelAnimationFrame(animationFrame)
-            gl.canvas.remove()
-            gl.getExtension("WEBGL_lose_context")?.loseContext()
+            return () => {
+                observer.disconnect()
+                window.removeEventListener("pointermove", handlePointerMove)
+                cancelAnimationFrame(animationFrame)
+                gl.canvas.remove()
+                gl.getExtension("WEBGL_lose_context")?.loseContext()
+            }
+        } catch {
+            // Graceful fallback for devices/environments without WebGL support
+            return
         }
     }, [variant])
 
@@ -162,8 +164,15 @@ export function ButtonLink({
             href={href}
             style={{ "--button-glow": variant === "primary" ? "#a78bfa" : "#7c3aed" } as CSSProperties}
         >
-            <span ref={effectRef} aria-hidden="true" className="pointer-events-none absolute -inset-5 z-10 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full" />
-            <span aria-hidden="true" className="absolute inset-px -z-10 rounded-[13px] bg-gradient-to-b from-white/10 to-transparent opacity-80" />
+            <span
+                ref={effectRef}
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-5 z-10 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full"
+            />
+            <span
+                aria-hidden="true"
+                className="absolute inset-px -z-10 rounded-[13px] bg-gradient-to-b from-white/10 to-transparent opacity-80"
+            />
             <span className="relative z-20 contents">{children}</span>
         </a>
     )

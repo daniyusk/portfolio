@@ -1,0 +1,41 @@
+import { render, screen } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+import { Home } from "@/pages/Home"
+import { ButtonLink } from "@/components/Buttons"
+import { ProfileTilt } from "@/components/ProfileTilt"
+
+// Mock Dither to avoid WebGL complex rendering in unit tests
+vi.mock("@/components/Dither", () => ({
+    Dither: () => <div data-testid="dither-mock" />,
+}))
+
+describe("Smoke Tests - Core Components", () => {
+    it("renders Home page with title and navigation buttons", () => {
+        render(<Home />)
+
+        expect(screen.getByRole("heading", { name: /daniyusk/i })).toBeInTheDocument()
+        expect(screen.getByRole("link", { name: /view projects/i })).toHaveAttribute("href", "#projects")
+        expect(screen.getByRole("link", { name: /contact me/i })).toHaveAttribute("href", "#contact")
+    })
+
+    it("renders ButtonLink component correctly", () => {
+        render(
+            <ButtonLink href="https://example.com" variant="primary">
+                Click here
+            </ButtonLink>,
+        )
+
+        const link = screen.getByRole("link", { name: /click here/i })
+        expect(link).toBeInTheDocument()
+        expect(link).toHaveAttribute("href", "https://example.com")
+    })
+
+    it("renders ProfileTilt with accessible GitHub link", () => {
+        render(<ProfileTilt />)
+
+        const githubLink = screen.getByRole("link", { name: /daniyusk.*github/i })
+        expect(githubLink).toBeInTheDocument()
+        expect(githubLink).toHaveAttribute("href", "https://github.com/daniyusk")
+        expect(githubLink).toHaveAttribute("target", "_blank")
+    })
+})

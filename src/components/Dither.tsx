@@ -1,7 +1,7 @@
 import { Canvas, type ThreeEvent, useFrame, useThree } from "@react-three/fiber"
 import { EffectComposer, wrapEffect } from "@react-three/postprocessing"
 import { Effect } from "postprocessing"
-import { forwardRef, useEffect, useRef, useState } from "react"
+import { type ComponentType, forwardRef, useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
 const waveVertexShader = `
@@ -155,8 +155,6 @@ class RetroEffectImpl extends Effect {
     }
 }
 
-import type { ComponentType } from "react"
-
 // biome-ignore lint/suspicious/noExplicitAny: wrapEffect returns a dynamic Three.js effect component
 const WrappedRetroEffect = wrapEffect(RetroEffectImpl) as ComponentType<any>
 
@@ -228,6 +226,20 @@ function DitheredWaves({
             currentRes.set(newWidth, newHeight)
         }
     }, [size, gl])
+
+    // Global pointer move listener so the mouse interaction works even with UI over the canvas
+    useEffect(() => {
+        if (!enableMouseInteraction || disableAnimation) return
+
+        const handleWindowPointerMove = (e: PointerEvent) => {
+            const rect = gl.domElement.getBoundingClientRect()
+            const dpr = gl.getPixelRatio()
+            mouseRef.current.set((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr)
+        }
+
+        window.addEventListener("pointermove", handleWindowPointerMove, { passive: true })
+        return () => window.removeEventListener("pointermove", handleWindowPointerMove)
+    }, [enableMouseInteraction, disableAnimation, gl])
 
     const prevColor = useRef([...waveColor])
     useFrame(({ clock }) => {
@@ -302,7 +314,7 @@ export interface DitherProps {
 }
 
 export function Dither({
-    waveSpeed = 0.05,
+    waveSpeed = 0.08,
     waveFrequency = 3,
     waveAmplitude = 0.3,
     waveColor = [0.48, 0.23, 0.93],
@@ -343,10 +355,9 @@ export function Dither({
     return (
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 opacity-80">
             <Canvas
-                className="h-full w-full"
+                className="w-full h-full relative"
                 camera={{ position: [0, 0, 6] }}
                 dpr={1}
-                frameloop={shouldAnimate ? "always" : "demand"}
                 gl={{ antialias: true, preserveDrawingBuffer: true }}
             >
                 <DitheredWaves

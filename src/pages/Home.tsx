@@ -1,21 +1,40 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import gsap from "gsap"
 import { Mail, MoreHorizontal, Rocket } from "lucide-react"
 import { ButtonLink } from "@/components/Buttons"
+import { Dither } from "@/components/Dither"
+import { ProfileTilt } from "@/components/ProfileTilt"
 import { typography } from "@/components/Typography"
 import { Terminal } from "@/components/Terminal"
 
 import LogoSVG from "@/assets/logo.svg?react"
 
 export function Home() {
+    const pageRef = useRef<HTMLElement>(null)
     const [descriptionOpened, setDescriptionOpened] = useState(false)
     const [hasPlayedTerminal, setHasPlayedTerminal] = useState(false)
+
+    useEffect(() => {
+        const page = pageRef.current
+        if (!page || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+        const context = gsap.context(() => {
+            const timeline = gsap.timeline({ defaults: { ease: "power3.out" } })
+            timeline
+                .fromTo("[data-hero-reveal]", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.75, stagger: 0.1 })
+                .fromTo(".profile-figure", { opacity: 0, x: 32, scale: 0.92 }, { opacity: 1, x: 0, scale: 1, duration: 0.9 }, "-=0.55")
+        }, page)
+
+        return () => context.revert()
+    }, [])
 
     const handleToggleDescription = () => {
         setDescriptionOpened((current) => !current)
     }
 
     return (
-        <main className="min-h-screen overflow-x-hidden">
+        <main ref={pageRef} className="relative isolate min-h-screen overflow-x-hidden">
+            <Dither />
             <section
                 aria-labelledby="hero-title"
                 className="
@@ -29,6 +48,8 @@ export function Home() {
                     gap-10
                     px-5
                     py-12
+                    relative
+                    z-10
                     sm:px-8
                     lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)]
                     lg:gap-14
@@ -37,7 +58,7 @@ export function Home() {
                 "
             >
                 <div className="flex min-w-0 w-full max-w-full flex-col gap-[2cqw] @container sm:max-w-152.5">
-                    <div className="w-full @container">
+                    <div className="w-full @container" data-hero-reveal>
                         <h1 id="hero-title" className="sr-only">
                             Daniyusk, Full-stack Developer
                         </h1>
@@ -67,7 +88,7 @@ export function Home() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4" data-hero-reveal>
                         <button
                             aria-controls="hero-terminal"
                             aria-expanded={descriptionOpened}
@@ -128,7 +149,7 @@ export function Home() {
                                 command="profile daniyusk --summary"
                                 id="hero-terminal"
                                 onFinish={() => setHasPlayedTerminal(true)}
-                                title="about.daniyusk"
+                                title="daniyusk.dev"
                                 typingSpeed={14}
                             >
                                 {`
@@ -141,7 +162,7 @@ export function Home() {
                         )}
                     </div>
 
-                    <div className="flex w-full min-w-0 gap-[2cqw]">
+                    <div className="flex w-full min-w-0 gap-[2cqw]" data-hero-reveal>
                         <ButtonLink
                             className="
                                 basis-0
@@ -181,32 +202,7 @@ export function Home() {
                     </div>
                 </div>
 
-                <div
-                    aria-hidden="true"
-                    className="
-                        mx-auto
-                        grid
-                        w-full
-                        max-w-72
-                        place-items-center
-                        sm:max-w-80
-                        lg:max-w-96
-                    "
-                >
-                    <div
-                        className="
-                            aspect-square
-                            w-full
-                            rounded-full
-                            border
-                            border-violet-400/35
-                            bg-zinc-950/95
-                            shadow-[0_0_120px_28px_rgba(124,58,237,0.32)]
-                            ring-1
-                            ring-white/10
-                        "
-                    />
-                </div>
+                <ProfileTilt />
             </section>
         </main>
     )

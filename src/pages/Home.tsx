@@ -2,6 +2,7 @@ import gsap from "gsap"
 import { Mail, Rocket } from "lucide-react"
 import { useEffect, useRef } from "react"
 import LogoSVG from "@/assets/logo.svg?react"
+import { AboutSection } from "@/components/AboutSection"
 import { ButtonLink } from "@/components/Buttons"
 import { ContactSection } from "@/components/ContactSection"
 import { Dither } from "@/components/Dither"
@@ -138,6 +139,7 @@ export function Home() {
                 />
             </div>
 
+            <AboutSection />
             <ContactSection />
         </main>
     )

@@ -55,4 +55,13 @@ describe("Smoke Tests - Core Components", () => {
             "https://discord.com/users/670030102490382346",
         )
     })
+
+    it("renders AboutSection with education and olympiad awards", () => {
+        render(<Home />)
+
+        expect(screen.getByRole("heading", { name: /engineering systems with logic/i })).toBeInTheDocument()
+        expect(screen.getAllByText(/cotuca \(unicamp\)/i).length).toBeGreaterThan(0)
+        expect(screen.getByText(/2x bronze medalist at obmep/i)).toBeInTheDocument()
+        expect(screen.getByText(/silver medalist at omasp/i)).toBeInTheDocument()
+    })
 })

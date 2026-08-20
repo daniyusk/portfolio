@@ -177,14 +177,14 @@ export function ContactSection() {
                                 target="_blank"
                                 rel="noreferrer"
                                 aria-label={`${item.name} (${item.handle})`}
-                                className={`group relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-transparent border-none shadow-none text-zinc-400 transition-all duration-200 active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400 ${item.hoverClass}`}
+                                className={`group relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-transparent border border-zinc-700/70 text-zinc-400 transition-all duration-200 active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400 ${item.hoverClass}`}
                             >
                                 <Icon className="h-8 w-8 transition-transform duration-200 group-hover:scale-110" />
 
-                                {/* Minimalist Modern Tooltip */}
+                                {/* Minimalist Modern Tooltip - positioned below */}
                                 <div
                                     role="tooltip"
-                                    className="pointer-events-none absolute bottom-full left-1/2 mb-3 -translate-x-1/2 opacity-0 scale-95 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 z-30 whitespace-nowrap"
+                                    className="pointer-events-none absolute top-full left-1/2 mt-3 -translate-x-1/2 opacity-0 scale-95 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 z-30 whitespace-nowrap"
                                 >
                                     <div className="rounded-xl bg-zinc-900/95 px-3.5 py-2 shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-md text-center">
                                         <p className="text-xs font-semibold text-white tracking-normal">{item.name}</p>

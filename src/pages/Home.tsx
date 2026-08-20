@@ -131,6 +131,10 @@ export function Home() {
                 </div>
 
                 <ProfileTilt />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-background via-background/60 to-transparent z-10"
+                />
             </section>
 
             <ContactSection />

@@ -23,6 +23,13 @@ globalThis.ResizeObserver = class ResizeObserver {
     disconnect() {}
 }
 
+// Mock IntersectionObserver
+globalThis.IntersectionObserver = class IntersectionObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+} as unknown as typeof IntersectionObserver
+
 // Mock Three.js / OGL / Canvas 2D / WebGL context for headless tests
 const createMockWebGLContext = () => ({
     clearColor: vi.fn(),

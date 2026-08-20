@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 
@@ -98,7 +98,7 @@ void main() {
 }
 `
 
-function DitherPlane() {
+function DitherPlane({ shouldAnimate }: { shouldAnimate: boolean }) {
     const materialRef = useRef<THREE.ShaderMaterial>(null)
     const targetMouse = useRef(new THREE.Vector2())
     const { viewport, size, gl } = useThree()
@@ -111,12 +111,14 @@ function DitherPlane() {
     }), [])
 
     useEffect(() => {
+        if (!shouldAnimate) return
+
         const handlePointerMove = (event: PointerEvent) => {
             targetMouse.current.set(event.clientX, event.clientY)
         }
         window.addEventListener("pointermove", handlePointerMove, { passive: true })
         return () => window.removeEventListener("pointermove", handlePointerMove)
-    }, [])
+    }, [shouldAnimate])
 
     useEffect(() => {
         const dpr = gl.getPixelRatio()
@@ -128,7 +130,7 @@ function DitherPlane() {
     }, [gl, size, uniforms])
 
     useFrame(({ clock }, delta) => {
-        if (!materialRef.current) return
+        if (!materialRef.current || !shouldAnimate) return
         uniforms.time.value = clock.elapsedTime
         uniforms.mousePos.value.lerp(targetMouse.current, Math.min(1, delta * 4))
     })
@@ -147,10 +149,44 @@ function DitherPlane() {
 }
 
 export function Dither() {
+    const [isPageVisible, setIsPageVisible] = useState(!document.hidden)
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+        setPrefersReducedMotion(mediaQuery.matches)
+
+        const handleMotionChange = (event: MediaQueryListEvent) => {
+            setPrefersReducedMotion(event.matches)
+        }
+        mediaQuery.addEventListener("change", handleMotionChange)
+
+        const handleVisibilityChange = () => {
+            setIsPageVisible(!document.hidden)
+        }
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        return () => {
+            mediaQuery.removeEventListener("change", handleMotionChange)
+            document.removeEventListener("visibilitychange", handleVisibilityChange)
+        }
+    }, [])
+
+    const shouldAnimate = isPageVisible && !prefersReducedMotion
+
     return (
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 opacity-80">
-            <Canvas camera={{ position: [0, 0, 1] }} dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: "high-performance" }}>
-                <DitherPlane />
+            <Canvas
+                camera={{ position: [0, 0, 1] }}
+                dpr={[1, 1.5]}
+                frameloop={shouldAnimate ? "always" : "demand"}
+                gl={{
+                    antialias: false,
+                    powerPreference: "high-performance",
+                    preserveDrawingBuffer: true,
+                }}
+            >
+                <DitherPlane shouldAnimate={shouldAnimate} />
             </Canvas>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,transparent_0%,rgba(10,10,15,0.18)_32%,rgba(10,10,15,0.88)_82%)]" />
         </div>

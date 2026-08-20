@@ -65,4 +65,17 @@ describe("Smoke Tests - Core Components", () => {
         )
         expect(screen.getByRole("link", { name: /email/i })).toHaveAttribute("href", "mailto:daniyusk.dev@gmail.com")
     })
+
+    it("renders AboutSection with education and olympiad awards", () => {
+        render(
+            <MemoryRouter>
+                <Home />
+            </MemoryRouter>,
+        )
+
+        expect(screen.getByRole("heading", { name: /engineering systems with logic/i })).toBeInTheDocument()
+        expect(screen.getAllByText(/cotuca \(unicamp\)/i).length).toBeGreaterThan(0)
+        expect(screen.getByText(/2x bronze medalist at obmep/i)).toBeInTheDocument()
+        expect(screen.getByText(/silver medalist at omasp/i)).toBeInTheDocument()
+    })
 })

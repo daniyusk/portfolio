@@ -1,10 +1,11 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 
 export function ProfileTilt() {
     const figureRef = useRef<HTMLElement>(null)
     const cardRef = useRef<HTMLAnchorElement>(null)
     const glareRef = useRef<HTMLSpanElement>(null)
+    const [imageError, setImageError] = useState(false)
 
     useEffect(() => {
         const figure = figureRef.current
@@ -56,6 +57,7 @@ export function ProfileTilt() {
     return (
         <figure
             ref={figureRef}
+            aria-label="Daniel (@daniyusk) profile card"
             className="profile-figure relative mx-auto grid aspect-square w-full max-w-72 place-items-center [perspective:900px] sm:max-w-80 lg:max-w-96"
         >
             <span aria-hidden="true" className="absolute inset-[4%] rounded-full bg-violet-600/25 blur-3xl" />
@@ -63,18 +65,28 @@ export function ProfileTilt() {
 
             <a
                 ref={cardRef}
-                aria-label="Open daniyusk on GitHub"
+                aria-label="Daniel (@daniyusk) on GitHub (opens in a new tab)"
                 className="group relative isolate block aspect-square w-[88%] overflow-hidden rounded-full border border-white/15 bg-zinc-950 shadow-[0_0_100px_22px_rgba(124,58,237,0.3),0_35px_70px_rgba(0,0,0,0.45)] outline-none will-change-transform [transform-style:preserve-3d] focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-violet-300"
                 href="https://github.com/daniyusk"
                 rel="noreferrer"
                 target="_blank"
             >
-                <img
-                    alt="Daniyusk's GitHub profile"
-                    className="h-full w-full object-cover saturate-[0.92] transition duration-700 group-hover:saturate-110"
-                    draggable="false"
-                    src="https://github.com/daniyusk.png?size=768"
-                />
+                {!imageError ? (
+                    <img
+                        alt="Daniel's GitHub profile avatar"
+                        className="h-full w-full object-cover saturate-[0.92] transition duration-700 group-hover:saturate-110"
+                        draggable="false"
+                        onError={() => setImageError(true)}
+                        src="https://github.com/daniyusk.png?size=768"
+                    />
+                ) : (
+                    <div
+                        aria-hidden="true"
+                        className="grid h-full w-full place-items-center bg-gradient-to-br from-violet-950 via-zinc-900 to-black text-4xl font-bold tracking-wider text-violet-300 sm:text-5xl"
+                    >
+                        <span>DY</span>
+                    </div>
+                )}
 
                 <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#0a0712]/70 via-transparent to-white/10" />
                 <span

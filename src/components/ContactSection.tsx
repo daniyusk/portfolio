@@ -1,6 +1,7 @@
 import { Discord } from "pixelarticons/react/Discord"
 import { Github } from "pixelarticons/react/Github"
 import { Linkedin } from "pixelarticons/react/Linkedin"
+import { useMemo } from "react"
 
 interface SocialContact {
     name: string
@@ -34,14 +35,74 @@ const CONTACTS: SocialContact[] = [
     },
 ]
 
+function SubtleStars() {
+    const stars = useMemo(() => {
+        return Array.from({ length: 48 }, (_, i) => {
+            // Deterministic distribution to avoid hydration issues
+            const x = Math.abs(Math.sin(i * 127.1 + 13.7) * 100)
+            const y = Math.abs(Math.cos(i * 311.7 + 71.9) * 100)
+            const size = i % 8 === 0 ? 2 : i % 3 === 0 ? 1.5 : 1
+            const baseOpacity = 0.18 + (i % 5) * 0.14
+            const duration = 2.4 + (i % 4) * 1.1
+            const delay = (i % 6) * 0.65
+
+            return {
+                id: i,
+                x: `${x.toFixed(2)}%`,
+                y: `${y.toFixed(2)}%`,
+                size,
+                baseOpacity,
+                duration,
+                delay,
+                isViolet: i % 6 === 0,
+            }
+        })
+    }, [])
+
+    return (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            {stars.map((star) => (
+                <span
+                    key={star.id}
+                    className={`absolute rounded-full animate-pulse ${star.isViolet ? "bg-violet-300" : "bg-white"}`}
+                    style={{
+                        left: star.x,
+                        top: star.y,
+                        width: `${star.size}px`,
+                        height: `${star.size}px`,
+                        opacity: star.baseOpacity,
+                        animationDuration: `${star.duration}s`,
+                        animationDelay: `${star.delay}s`,
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
 export function ContactSection() {
     return (
         <section
             id="contact"
             aria-labelledby="contact-heading"
-            className="relative z-10 w-full border-t border-white/8 bg-background py-20 px-5 sm:px-8 font-jetbrains"
+            className="relative z-10 w-full overflow-hidden bg-background py-24 px-5 sm:px-8 font-jetbrains"
         >
-            <div className="mx-auto flex max-w-2xl flex-col items-center justify-center text-center">
+            {/* Smooth top dissolve gradient over the fixed Dither background */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-32 left-0 right-0 h-32 sm:-top-48 sm:h-48 bg-gradient-to-b from-transparent via-background/70 to-background"
+            />
+
+            {/* Subtle background starfield strictly contained in Contact section */}
+            <SubtleStars />
+
+            {/* Subtle radial ambient glow */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(124,58,237,0.07)_0%,transparent_75%)]"
+            />
+
+            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center justify-center text-center">
                 <h2
                     id="contact-heading"
                     className="text-lg font-bold tracking-wider text-white uppercase sm:text-2xl lg:text-3xl"
@@ -64,16 +125,17 @@ export function ContactSection() {
                             >
                                 <Icon className="h-7 w-7 transition-transform duration-150 group-hover:scale-110" />
 
-                                {/* Retro Tooltip */}
+                                {/* Minimalist Modern Tooltip */}
                                 <div
                                     role="tooltip"
-                                    className="pointer-events-none absolute bottom-full left-1/2 mb-3 -translate-x-1/2 opacity-0 transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:-translate-y-1 group-focus-visible:-translate-y-1 z-30 whitespace-nowrap"
+                                    className="pointer-events-none absolute bottom-full left-1/2 mb-2.5 -translate-x-1/2 opacity-0 scale-95 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 z-30 whitespace-nowrap"
                                 >
-                                    <div className="border-2 border-white/20 bg-surface-terminal px-3 py-1.5 shadow-[3px_3px_0px_0px_#7c3aed] text-left">
-                                        <p className="text-xs font-bold text-white tracking-wide">{item.name}</p>
-                                        <p className="text-[0.68rem] text-zinc-400 font-mono">-&#35; {item.handle}</p>
+                                    <div className="rounded-xl bg-zinc-900/95 px-3.5 py-2 shadow-[0_12px_32px_rgba(0,0,0,0.6)] backdrop-blur-md text-center">
+                                        <p className="text-xs font-semibold text-white tracking-normal">{item.name}</p>
+                                        <p className="text-[0.72rem] font-medium text-zinc-400 leading-tight">
+                                            {item.handle}
+                                        </p>
                                     </div>
-                                    <div className="mx-auto h-1.5 w-1.5 -translate-y-[3px] rotate-45 border-r-2 border-b-2 border-white/20 bg-surface-terminal" />
                                 </div>
                             </a>
                         )

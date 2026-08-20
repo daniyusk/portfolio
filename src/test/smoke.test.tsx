@@ -38,4 +38,21 @@ describe("Smoke Tests - Core Components", () => {
         expect(githubLink).toHaveAttribute("href", "https://github.com/daniyusk")
         expect(githubLink).toHaveAttribute("target", "_blank")
     })
+
+    it("renders ContactSection with pixel art links and heading", () => {
+        render(<Home />)
+
+        expect(screen.getByRole("heading", { name: /let's build something togheter/i })).toBeInTheDocument()
+        expect(screen.getByRole("link", { name: /linkedin/i })).toHaveAttribute(
+            "href",
+            "https://www.linkedin.com/in/daniel-senzaki-132905407/",
+        )
+        expect(
+            screen.getAllByRole("link", { name: /github/i })[1] ?? screen.getByRole("link", { name: /github/i }),
+        ).toHaveAttribute("href", "https://github.com/daniyusk")
+        expect(screen.getByRole("link", { name: /discord/i })).toHaveAttribute(
+            "href",
+            "https://discord.com/users/670030102490382346",
+        )
+    })
 })

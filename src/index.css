@@ -22,6 +22,10 @@
     --color-violet-600: #7c3aed;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     @apply bg-background text-white antialiased;
     min-width: 320px;

@@ -3,6 +3,7 @@ import { Mail, Rocket } from "lucide-react"
 import { useEffect, useRef } from "react"
 import LogoSVG from "@/assets/logo.svg?react"
 import { ButtonLink } from "@/components/Buttons"
+import { ContactSection } from "@/components/ContactSection"
 import { Dither } from "@/components/Dither"
 import { ProfileTilt } from "@/components/ProfileTilt"
 import { typography } from "@/components/Typography"
@@ -131,6 +132,8 @@ export function Home() {
 
                 <ProfileTilt />
             </section>
+
+            <ContactSection />
         </main>
     )
 }

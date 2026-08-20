@@ -1,18 +1,15 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import gsap from "gsap"
-import { Mail, MoreHorizontal, Rocket } from "lucide-react"
+import { Mail, Rocket } from "lucide-react"
 import { ButtonLink } from "@/components/Buttons"
 import { Dither } from "@/components/Dither"
 import { ProfileTilt } from "@/components/ProfileTilt"
 import { typography } from "@/components/Typography"
-import { Terminal } from "@/components/Terminal"
 
 import LogoSVG from "@/assets/logo.svg?react"
 
 export function Home() {
     const pageRef = useRef<HTMLElement>(null)
-    const [descriptionOpened, setDescriptionOpened] = useState(false)
-    const [hasPlayedTerminal, setHasPlayedTerminal] = useState(false)
 
     useEffect(() => {
         const page = pageRef.current
@@ -27,10 +24,6 @@ export function Home() {
 
         return () => context.revert()
     }, [])
-
-    const handleToggleDescription = () => {
-        setDescriptionOpened((current) => !current)
-    }
 
     return (
         <main ref={pageRef} className="relative isolate min-h-screen overflow-x-hidden">
@@ -88,78 +81,8 @@ export function Home() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col gap-4" data-hero-reveal>
-                        <button
-                            aria-controls="hero-terminal"
-                            aria-expanded={descriptionOpened}
-                            aria-label="Toggle terminal description"
-                            className="
-                                group
-                                flex
-                                w-full
-                                items-center
-                                gap-3
-                                text-zinc-500
-                                transition-colors
-                                hover:text-zinc-300
-                                focus-visible:outline-2
-                                focus-visible:outline-offset-4
-                                focus-visible:outline-violet-400
-                            "
-                            onClick={handleToggleDescription}
-                            type="button"
-                        >
-                            <span
-                                className="
-                                    h-px
-                                    flex-1
-                                    bg-white/8
-                                    transition-colors
-                                    group-hover:bg-violet-500/40
-                                "
-                            />
-
-                            <span
-                                className={`
-                                    grid
-                                    h-7
-                                    w-10
-                                    place-items-center
-                                    rounded-full
-                                    border
-                                    border-white/8
-                                    bg-white/6
-                                    shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]
-                                    transition-colors
-                                    ${descriptionOpened ? "border-violet-500/60 text-violet-300" : ""}
-                                `}
-                            >
-                                <MoreHorizontal aria-hidden="true" className="h-5 w-5" />
-                            </span>
-                        </button>
-
-                        {descriptionOpened && (
-                            <Terminal
-                                animate={!hasPlayedTerminal}
-                                className="
-                                    w-full
-                                    max-w-full
-                                    sm:max-w-2xl
-                                "
-                                command="profile daniyusk --summary"
-                                id="hero-terminal"
-                                onFinish={() => setHasPlayedTerminal(true)}
-                                title="daniyusk.dev"
-                                typingSpeed={14}
-                            >
-                                {`
-                                    Name: Daniel
-                                    Role: Full-stack Developer
-                                    Focus: Interfaces, systems and polished web experiences
-                                    Status: Always learning and building
-                                `}
-                            </Terminal>
-                        )}
+                    <div aria-hidden="true" className="w-full py-1" data-hero-reveal>
+                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/12 to-transparent" />
                     </div>
 
                     <div className="flex w-full min-w-0 gap-[2cqw]" data-hero-reveal>

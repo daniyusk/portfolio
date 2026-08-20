@@ -33,109 +33,110 @@ export function Home() {
     return (
         <main ref={pageRef} className="relative isolate min-h-screen overflow-x-hidden">
             <Dither />
-            <section
-                aria-labelledby="hero-title"
-                className="
-                    mx-auto
-                    grid
-                    min-h-screen
-                    w-full
-                    max-w-7xl
-                    grid-cols-1
-                    items-center
-                    gap-10
-                    px-5
-                    py-12
-                    relative
-                    z-10
-                    sm:px-8
-                    lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)]
-                    lg:gap-14
-                    lg:px-12
-                    lg:py-16
-                "
-            >
-                <div className="flex min-w-0 w-full max-w-full flex-col gap-[2cqw] @container sm:max-w-152.5">
-                    <div className="w-full @container" data-hero-reveal>
-                        <h1 id="hero-title" className="sr-only">
-                            Daniyusk, Full-stack Developer
-                        </h1>
+            <div className="relative z-10 w-full min-h-screen flex flex-col justify-center">
+                <section
+                    aria-labelledby="hero-title"
+                    className="
+                        mx-auto
+                        grid
+                        min-h-screen
+                        w-full
+                        max-w-7xl
+                        grid-cols-1
+                        items-center
+                        gap-10
+                        px-5
+                        py-12
+                        sm:px-8
+                        lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)]
+                        lg:gap-14
+                        lg:px-12
+                        lg:py-16
+                    "
+                >
+                    <div className="flex min-w-0 w-full max-w-full flex-col gap-[2cqw] @container sm:max-w-152.5">
+                        <div className="w-full @container" data-hero-reveal>
+                            <h1 id="hero-title" className="sr-only">
+                                Daniyusk, Full-stack Developer
+                            </h1>
 
-                        <LogoSVG
-                            aria-hidden="true"
-                            className="
-                                block
-                                h-auto
-                                w-full
-                                max-w-full
-                            "
-                        />
+                            <LogoSVG
+                                aria-hidden="true"
+                                className="
+                                    block
+                                    h-auto
+                                    w-full
+                                    max-w-full
+                                "
+                            />
 
-                        <p
-                            className={`
-                                ${typography.bodySmall}
-                                mt-[4cqw]
-                                w-full
-                                text-center
-                                text-[clamp(0.9rem,4.2cqw,1.7rem)]
-                                leading-none
-                                whitespace-nowrap
-                            `}
-                        >
-                            In constant debug - of life and code
-                        </p>
+                            <p
+                                className={`
+                                    ${typography.bodySmall}
+                                    mt-[4cqw]
+                                    w-full
+                                    text-center
+                                    text-[clamp(0.9rem,4.2cqw,1.7rem)]
+                                    leading-none
+                                    whitespace-nowrap
+                                `}
+                            >
+                                In constant debug - of life and code
+                            </p>
+                        </div>
+
+                        <div aria-hidden="true" className="w-full py-1" data-hero-reveal>
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+                        </div>
+
+                        <div className="flex w-full min-w-0 gap-[2cqw]" data-hero-reveal>
+                            <ButtonLink
+                                className="
+                                    basis-0
+                                    flex-1
+                                    min-w-0
+                                    justify-center
+                                    px-[3cqw]
+                                    py-[1.4cqw]
+                                    text-[clamp(0.8rem,2.2cqw,1.25rem)]
+                                    [&>svg]:h-[1.2em]
+                                    [&>svg]:w-[1.2em]
+                                "
+                                href="#projects"
+                            >
+                                <Rocket aria-hidden="true" />
+                                View Projects
+                            </ButtonLink>
+
+                            <ButtonLink
+                                className="
+                                    basis-0
+                                    flex-1
+                                    min-w-0
+                                    justify-center
+                                    px-[3cqw]
+                                    py-[1.4cqw]
+                                    text-[clamp(0.8rem,2.2cqw,1.25rem)]
+                                    [&>svg]:h-[1.2em]
+                                    [&>svg]:w-[1.2em]
+                                "
+                                href="#contact"
+                                variant="secondary"
+                            >
+                                <Mail aria-hidden="true" />
+                                Contact me
+                            </ButtonLink>
+                        </div>
                     </div>
 
-                    <div aria-hidden="true" className="w-full py-1" data-hero-reveal>
-                        <div className="h-px w-full bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-                    </div>
+                    <ProfileTilt />
+                </section>
 
-                    <div className="flex w-full min-w-0 gap-[2cqw]" data-hero-reveal>
-                        <ButtonLink
-                            className="
-                                basis-0
-                                flex-1
-                                min-w-0
-                                justify-center
-                                px-[3cqw]
-                                py-[1.4cqw]
-                                text-[clamp(0.8rem,2.2cqw,1.25rem)]
-                                [&>svg]:h-[1.2em]
-                                [&>svg]:w-[1.2em]
-                            "
-                            href="#projects"
-                        >
-                            <Rocket aria-hidden="true" />
-                            View Projects
-                        </ButtonLink>
-
-                        <ButtonLink
-                            className="
-                                basis-0
-                                flex-1
-                                min-w-0
-                                justify-center
-                                px-[3cqw]
-                                py-[1.4cqw]
-                                text-[clamp(0.8rem,2.2cqw,1.25rem)]
-                                [&>svg]:h-[1.2em]
-                                [&>svg]:w-[1.2em]
-                            "
-                            href="#contact"
-                            variant="secondary"
-                        >
-                            <Mail aria-hidden="true" />
-                            Contact me
-                        </ButtonLink>
-                    </div>
-                </div>
-
-                <ProfileTilt />
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-background via-background/60 to-transparent z-10"
+                    className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-48 bg-gradient-to-t from-background via-background/70 to-transparent z-10"
                 />
-            </section>
+            </div>
 
             <ContactSection />
         </main>

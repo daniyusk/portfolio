@@ -38,6 +38,18 @@ body {
     color: white;
 }
 
+@keyframes star-twinkle {
+    0%,
+    100% {
+        opacity: var(--min-op, 0.15);
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: var(--max-op, 0.95);
+        transform: scale(1.25);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 
 const vertexShader = `

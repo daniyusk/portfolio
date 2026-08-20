@@ -1,6 +1,6 @@
+import { Color, Mesh, Program, Renderer, Triangle } from "ogl"
 import type { CSSProperties, ReactNode } from "react"
 import { useEffect, useRef } from "react"
-import { Color, Mesh, Program, Renderer, Triangle } from "ogl"
 import { cn } from "@/styles/utils"
 
 type ButtonLinkProps = {

@@ -7,7 +7,9 @@
     --font-jetbrains: "JetBrains Mono", monospace;
 
     /* Colors */
-    --color-gray-600: #8a8aa3 --color-violet-500: #5b21b6 --color-violet-600: #7c3aed;
+    --color-gray-600: #8a8aa3;
+    --color-violet-500: #5b21b6;
+    --color-violet-600: #7c3aed;
 }
 
 body {

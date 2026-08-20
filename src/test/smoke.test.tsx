@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
-import { Home } from "@/pages/Home"
 import { ButtonLink } from "@/components/Buttons"
 import { ProfileTilt } from "@/components/ProfileTilt"
+import { Home } from "@/pages/Home"
 
 // Mock Dither to avoid WebGL complex rendering in unit tests
 vi.mock("@/components/Dither", () => ({

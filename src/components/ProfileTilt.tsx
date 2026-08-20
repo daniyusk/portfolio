@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
+import { useEffect, useRef, useState } from "react"
 
 export function ProfileTilt() {
     const figureRef = useRef<HTMLElement>(null)

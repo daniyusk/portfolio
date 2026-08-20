@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { Check, ChevronRight, Copy, TerminalSquare } from "lucide-react"
+import { useEffect, useRef } from "react"
 import { TerminalTyping } from "./TerminalTyping"
 
 type TerminalProps = {
@@ -54,7 +54,6 @@ export function Terminal({
             aria-label={`Terminal running ${commandText}`}
             className={`overflow-hidden rounded-2xl border border-white/12 bg-[#08080c]/96 font-jetbrains shadow-[0_30px_90px_rgba(0,0,0,0.5)] ring-1 ring-violet-400/10 backdrop-blur-xl ${className}`}
             id={id}
-            role="region"
         >
             <div className="flex min-h-11 items-center justify-between gap-3 border-b border-white/8 bg-white/[0.035] px-4">
                 <div aria-hidden="true" className="flex gap-1.5">
@@ -86,10 +85,7 @@ export function Terminal({
                 </span>
             </div>
 
-            <div
-                className="max-h-[min(46vh,28rem)] overflow-auto p-4 text-[0.72rem] leading-5 sm:p-5 sm:text-[0.8rem] sm:leading-6"
-                tabIndex={0}
-            >
+            <div className="max-h-[min(46vh,28rem)] overflow-auto p-4 text-[0.72rem] leading-5 sm:p-5 sm:text-[0.8rem] sm:leading-6">
                 <div className="mb-4 grid grid-cols-[auto_minmax(0,1fr)] gap-2.5 text-zinc-200">
                     <ChevronRight aria-hidden="true" className="mt-1 h-4 w-4 text-violet-400" />
                     <span className="min-w-0 break-words font-medium">{commandText}</span>

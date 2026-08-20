@@ -7,13 +7,23 @@
     --font-jetbrains: "JetBrains Mono", monospace;
 
     /* Colors */
+    --color-background: #0a0a0f;
+    --color-surface-terminal: #08080c;
+    --color-surface-deep: #0a0712;
+
+    --color-terminal-red: #ff5f57;
+    --color-terminal-yellow: #febc2e;
+    --color-terminal-green: #28c840;
+
     --color-gray-600: #8a8aa3;
+    --color-violet-300: #c4b5fd;
+    --color-violet-400: #a78bfa;
     --color-violet-500: #5b21b6;
     --color-violet-600: #7c3aed;
 }
 
 body {
-    @apply bg-[#0A0A0F] text-white antialiased;
+    @apply bg-background text-white antialiased;
     min-width: 320px;
     min-height: 100vh;
     overflow-x: hidden;

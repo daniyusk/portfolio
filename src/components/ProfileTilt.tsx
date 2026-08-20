@@ -93,7 +93,7 @@ export function ProfileTilt() {
 
                 <span
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-[#0a0712]/70 via-transparent to-white/10"
+                    className="absolute inset-0 bg-gradient-to-t from-surface-deep/70 via-transparent to-white/10"
                 />
                 <span
                     ref={glareRef}

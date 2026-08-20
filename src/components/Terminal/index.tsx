@@ -52,14 +52,14 @@ export function Terminal({
         <section
             ref={terminalRef}
             aria-label={`Terminal running ${commandText}`}
-            className={`overflow-hidden rounded-2xl border border-white/12 bg-[#08080c]/96 font-jetbrains shadow-[0_30px_90px_rgba(0,0,0,0.5)] ring-1 ring-violet-400/10 backdrop-blur-xl ${className}`}
+            className={`overflow-hidden rounded-2xl border border-white/12 bg-surface-terminal/96 font-jetbrains shadow-[0_30px_90px_rgba(0,0,0,0.5)] ring-1 ring-violet-400/10 backdrop-blur-xl ${className}`}
             id={id}
         >
             <div className="flex min-h-11 items-center justify-between gap-3 border-b border-white/8 bg-white/[0.035] px-4">
                 <div aria-hidden="true" className="flex gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-terminal-red" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-terminal-yellow" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-terminal-green" />
                 </div>
 
                 <span className="flex min-w-0 items-center gap-2 truncate text-[0.67rem] font-medium tracking-[0.08em] text-zinc-500">

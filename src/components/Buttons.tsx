@@ -1,6 +1,7 @@
 import { Color, Mesh, Program, Renderer, Triangle } from "ogl"
 import type { CSSProperties, ReactNode } from "react"
 import { useEffect, useRef } from "react"
+import { colors } from "@/styles/tokens"
 import { cn } from "@/styles/utils"
 
 type ButtonLinkProps = {
@@ -93,8 +94,8 @@ export function ButtonLink({ children, className, href, variant = "primary" }: B
             let animationFrame = 0
             let lastTime = performance.now()
 
-            const lineColor = new Color(variant === "primary" ? "#ffffff" : "#c4b5fd")
-            const baseColor = new Color(variant === "primary" ? "#7c3aed" : "#5b21b6")
+            const lineColor = new Color(variant === "primary" ? colors.white : colors.violet[300])
+            const baseColor = new Color(variant === "primary" ? colors.violet[600] : colors.violet[500])
             program.uniforms.uLineColor.value = [lineColor.r, lineColor.g, lineColor.b]
             program.uniforms.uBaseColor.value = [baseColor.r, baseColor.g, baseColor.b]
 
@@ -162,7 +163,9 @@ export function ButtonLink({ children, className, href, variant = "primary" }: B
                 className,
             )}
             href={href}
-            style={{ "--button-glow": variant === "primary" ? "#a78bfa" : "#7c3aed" } as CSSProperties}
+            style={
+                { "--button-glow": variant === "primary" ? colors.violet[400] : colors.violet[600] } as CSSProperties
+            }
         >
             <span
                 ref={effectRef}

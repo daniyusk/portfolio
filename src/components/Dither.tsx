@@ -273,9 +273,13 @@ function DitheredWaves({
         mouseRef.current.set((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr)
     }
 
+    // In perspective camera at z=6, calculate visible width & height at z=0
+    const visibleHeight = 2 * Math.tan(THREE.MathUtils.degToRad(75) / 2) * 6
+    const visibleWidth = visibleHeight * viewport.aspect
+
     return (
         <>
-            <mesh ref={mesh} scale={[viewport.width, viewport.height, 1]}>
+            <mesh ref={mesh} scale={[visibleWidth, visibleHeight, 1]}>
                 <planeGeometry args={[1, 1]} />
                 <shaderMaterial
                     vertexShader={waveVertexShader}
@@ -291,7 +295,7 @@ function DitheredWaves({
             <mesh
                 onPointerMove={handlePointerMove}
                 position={[0, 0, 0.01]}
-                scale={[viewport.width, viewport.height, 1]}
+                scale={[visibleWidth, visibleHeight, 1]}
                 visible={false}
             >
                 <planeGeometry args={[1, 1]} />
@@ -314,7 +318,7 @@ export interface DitherProps {
 }
 
 export function Dither({
-    waveSpeed = 0.08,
+    waveSpeed = 0.05,
     waveFrequency = 3,
     waveAmplitude = 0.3,
     waveColor = [0.48, 0.23, 0.93],
@@ -353,10 +357,10 @@ export function Dither({
     const shouldAnimate = !disableAnimation && isPageVisible && !prefersReducedMotion
 
     return (
-        <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 opacity-80">
+        <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 opacity-90">
             <Canvas
-                className="w-full h-full relative"
-                camera={{ position: [0, 0, 6] }}
+                className="h-full w-full"
+                camera={{ position: [0, 0, 6], fov: 75 }}
                 dpr={1}
                 gl={{ antialias: true, preserveDrawingBuffer: true }}
             >
@@ -372,7 +376,7 @@ export function Dither({
                     mouseRadius={mouseRadius}
                 />
             </Canvas>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,transparent_0%,rgba(10,10,15,0.18)_32%,rgba(10,10,15,0.88)_82%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,transparent_0%,rgba(10,10,15,0.45)_50%,rgba(10,10,15,0.92)_90%)]" />
         </div>
     )
 }

@@ -17,7 +17,8 @@ export interface ProjectLinks {
 export interface Project {
     id: string
     title: string
-    description: string
+    shortDescription: string
+    fullDescription: string
     isFeatured: boolean
     tags: string[]
     media: ProjectMedia[]

@@ -4,8 +4,10 @@ export const projectsData: Project[] = [
     {
         id: "orbital-ui",
         title: "Orbital 3D Engine & UI",
-        description:
-            "Interactive WebGL component library and generative shader engine built for high-performance creative web applications and immersive experiences.",
+        shortDescription:
+            "Interactive WebGL component library and generative shader engine built for high-performance creative web applications.",
+        fullDescription:
+            "Orbital UI is a specialized WebGL & Three.js design system developed to blend reactive user interfaces with mathematical generative shaders. It features custom GLSL post-processing pipelines, interactive particle physics, and a modular node editor designed to run at 60+ FPS on diverse device tiers with minimal battery overhead.",
         isFeatured: true,
         featuredOrder: 1,
         tags: ["React", "Three.js", "TypeScript", "WebGL", "Tailwind CSS"],
@@ -36,8 +38,10 @@ export const projectsData: Project[] = [
     {
         id: "nexus-flow",
         title: "Nexus Flow Collaborative Canvas",
-        description:
-            "Real-time multiplayer workspace featuring conflict-free replicated data types (CRDTs), distributed event streaming, and sub-10ms state synchronization.",
+        shortDescription:
+            "Real-time collaborative canvas with CRDT synchronization and sub-10ms distributed event streaming.",
+        fullDescription:
+            "Nexus Flow is a multiplayer architecture designed for high-concurrency infinite canvas interactions. Leveraging Conflict-Free Replicated Data Types (CRDT algorithms) combined with WebSocket clustering and worker threads, Nexus Flow handles concurrent vector rendering, cursor presence, and undo/redo history trees without central lock contention.",
         isFeatured: true,
         featuredOrder: 2,
         tags: ["TypeScript", "WebSocket", "Node.js", "CRDT", "React"],
@@ -67,8 +71,10 @@ export const projectsData: Project[] = [
     {
         id: "hyperterminal-cli",
         title: "HyperTerminal Cloud Shell",
-        description:
-            "Browser-native high-performance terminal emulator with WebAssembly micro-containers, PTY multiplexing, SSH tunneling, and AI command completions.",
+        shortDescription:
+            "Browser-native high-performance terminal emulator with WebAssembly micro-containers and AI command completions.",
+        fullDescription:
+            "HyperTerminal is a web-based POSIX terminal environment compiled with Rust and WebAssembly. It features hardware-accelerated canvas/WebGL glyph rasterization, SSH/PTY stream multiplexing, sandboxed WASM micro-containers for client-side tool execution, and context-aware LLM command synthesis directly in the shell.",
         isFeatured: true,
         featuredOrder: 3,
         tags: ["Rust", "WASM", "React", "Docker", "Tailwind CSS"],
@@ -91,8 +97,10 @@ export const projectsData: Project[] = [
     {
         id: "aura-observability",
         title: "Aura Microservices Observability",
-        description:
-            "Fullstack distributed tracing and metric monitoring suite built with Go and React, supporting OpenTelemetry instrumentation and automated anomaly alerts.",
+        shortDescription:
+            "Fullstack distributed tracing and metric telemetry suite supporting OpenTelemetry and automated anomaly detection.",
+        fullDescription:
+            "Aura Observability delivers unified visibility into distributed microservices architectures. Engineered with Go, React, and OpenTelemetry standards, it visualizes service dependency meshes, ingests millions of span events per minute, and correlates latency anomalies with automated root-cause diagnostics and incident alerts.",
         isFeatured: false,
         tags: ["Fullstack", "Go", "React", "PostgreSQL", "OpenTelemetry"],
         media: [
@@ -113,8 +121,10 @@ export const projectsData: Project[] = [
     {
         id: "spectra-agent",
         title: "Spectra Autonomous Refactoring Agent",
-        description:
-            "Context-aware AI coding agent that performs multi-file semantic analysis, AST tree transformations, dependency audits, and automated PR generation.",
+        shortDescription:
+            "Context-aware AI refactoring engine performing AST transformations and automated multi-file semantic migrations.",
+        fullDescription:
+            "Spectra is an autonomous code intelligence agent that analyzes large-scale TypeScript and Python codebases. By parsing Abstract Syntax Trees (AST) and constructing semantic call graphs, Spectra generates type-safe migrations, resolves API breaking changes, and formulates verified pull requests with comprehensive test suites.",
         isFeatured: false,
         tags: ["Python", "FastAPI", "React", "TypeScript", "LLM"],
         media: [
@@ -135,8 +145,10 @@ export const projectsData: Project[] = [
     {
         id: "pulse-dsp-audio",
         title: "Pulse Spatial Audio Synthesizer",
-        description:
-            "Modular digital signal processing (DSP) engine and polyphonic synthesizer executing entirely in WebAssembly audio worklets with spatial binaural panning.",
+        shortDescription:
+            "Modular digital signal processing engine and polyphonic synthesizer running in WebAssembly audio worklets.",
+        fullDescription:
+            "Pulse is a browser-based modular synthesizer and digital signal processing (DSP) suite. Operating directly within low-latency Web Audio Worklet threads compiled from C++ and Rust, it features dual-oscillator FM synthesis, binaural spatial panning, customizable filter topologies, and an oscilloscope visualizer.",
         isFeatured: false,
         tags: ["Web Audio API", "TypeScript", "WASM", "DSP", "Canvas API"],
         media: [
@@ -164,6 +176,10 @@ export const getFeaturedProjects = (): Project[] => {
 
 export const getAllProjects = (): Project[] => {
     return [...projectsData]
+}
+
+export const getProjectById = (id: string): Project | undefined => {
+    return projectsData.find((project) => project.id === id)
 }
 
 export const getAllTags = (): string[] => {

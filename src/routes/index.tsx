@@ -1,14 +1,29 @@
-import { createBrowserRouter } from "react-router-dom"
+import { createBrowserRouter, Outlet } from "react-router-dom"
+import { ScrollToTop } from "@/components/ScrollToTop"
 import { Home } from "@/pages/Home"
 import { Projects } from "@/pages/Projects"
 
+function RootLayout() {
+    return (
+        <>
+            <ScrollToTop />
+            <Outlet />
+        </>
+    )
+}
+
 export const router = createBrowserRouter([
     {
-        path: "/",
-        element: <Home />,
-    },
-    {
-        path: "/projects",
-        element: <Projects />,
+        element: <RootLayout />,
+        children: [
+            {
+                path: "/",
+                element: <Home />,
+            },
+            {
+                path: "/projects",
+                element: <Projects />,
+            },
+        ],
     },
 ])

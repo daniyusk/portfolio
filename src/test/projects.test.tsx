@@ -4,8 +4,9 @@ import { describe, expect, it, vi } from "vitest"
 import { MediaViewer } from "@/components/MediaViewer"
 import { ProjectCard } from "@/components/ProjectCard"
 import { ProjectGrid } from "@/components/ProjectGrid"
+import { ProjectModal } from "@/components/ProjectModal"
 import { FeaturedProjectsSection } from "@/components/Projects"
-import { getAllProjects, getAllTags, getFeaturedProjects, projectsData } from "@/data/projects"
+import { getAllProjects, getAllTags, getFeaturedProjects, getProjectById, projectsData } from "@/data/projects"
 import { Projects } from "@/pages/Projects"
 import type { Project } from "@/types/project"
 
@@ -17,7 +18,8 @@ vi.mock("@/components/Dither", () => ({
 const mockSingleProject: Project = {
     id: "test-proj",
     title: "Test System Alpha",
-    description: "A test project for unit assertions.",
+    shortDescription: "A concise test summary for cards.",
+    fullDescription: "A comprehensive deep dive description for modal exploration with detailed architecture.",
     isFeatured: true,
     tags: ["React", "TypeScript", "Tailwind CSS"],
     media: [
@@ -46,7 +48,8 @@ describe("Projects Data Model & Helpers", () => {
         for (const project of projectsData) {
             expect(project.id).toBeTruthy()
             expect(project.title).toBeTruthy()
-            expect(project.description).toBeTruthy()
+            expect(project.shortDescription).toBeTruthy()
+            expect(project.fullDescription).toBeTruthy()
             expect(typeof project.isFeatured).toBe("boolean")
             expect(Array.isArray(project.tags)).toBe(true)
             expect(project.tags.length).toBeGreaterThan(0)
@@ -64,6 +67,15 @@ describe("Projects Data Model & Helpers", () => {
     it("getAllProjects returns the complete list of projects", () => {
         const all = getAllProjects()
         expect(all.length).toBe(projectsData.length)
+    })
+
+    it("getProjectById returns the correct project or undefined", () => {
+        const project = getProjectById("orbital-ui")
+        expect(project).toBeDefined()
+        expect(project?.title).toBe("Orbital 3D Engine & UI")
+
+        const nonExistent = getProjectById("non-existent-id")
+        expect(nonExistent).toBeUndefined()
     })
 
     it("getAllTags returns sorted unique tags across all projects", () => {
@@ -94,7 +106,7 @@ describe("MediaViewer Component", () => {
         expect(screen.getByText("IMG")).toBeInTheDocument()
     })
 
-    it("renders video element when type is video", () => {
+    it("renders video element with controls and muted playback", () => {
         const { container } = render(
             <MediaViewer
                 media={[
@@ -110,6 +122,7 @@ describe("MediaViewer Component", () => {
         const video = container.querySelector("video")
         expect(video).toBeInTheDocument()
         expect(video).toHaveAttribute("src", "https://example.com/video.mp4")
+        expect(video?.muted).toBe(true)
     })
 
     it("displays error fallback on asset load error", () => {
@@ -154,23 +167,31 @@ describe("MediaViewer Component", () => {
 })
 
 describe("ProjectCard Component", () => {
-    it("renders title, description, tags, and action links", () => {
-        render(<ProjectCard project={mockSingleProject} />)
+    it("renders title, shortDescription, tags, and handles selection click", () => {
+        const onSelect = vi.fn()
+        render(<ProjectCard project={mockSingleProject} onSelect={onSelect} />)
 
         expect(screen.getByText("Test System Alpha")).toBeInTheDocument()
-        expect(screen.getByText("A test project for unit assertions.")).toBeInTheDocument()
+        expect(screen.getByText("A concise test summary for cards.")).toBeInTheDocument()
         expect(screen.getByText("React")).toBeInTheDocument()
         expect(screen.getByText("TypeScript")).toBeInTheDocument()
         expect(screen.getByText("Tailwind CSS")).toBeInTheDocument()
 
-        const liveDemo = screen.getByRole("link", { name: /view live demo/i })
-        expect(liveDemo).toHaveAttribute("href", "https://test-proj.demo.app")
+        const card = screen.getByRole("button", { name: /view details for test system alpha/i })
+        fireEvent.click(card)
+        expect(onSelect).toHaveBeenCalledWith(mockSingleProject)
+    })
 
-        const repoLink = screen.getByRole("link", { name: /view github repository/i })
-        expect(repoLink).toHaveAttribute("href", "https://github.com/daniyusk/test-proj")
+    it("triggers selection when pressing Enter or Space key", () => {
+        const onSelect = vi.fn()
+        render(<ProjectCard project={mockSingleProject} onSelect={onSelect} />)
 
-        const caseStudyLink = screen.getByRole("link", { name: /read case study/i })
-        expect(caseStudyLink).toHaveAttribute("href", "https://daniyusk.dev/cases/test-proj")
+        const card = screen.getByRole("button", { name: /view details for test system alpha/i })
+        fireEvent.keyDown(card, { key: "Enter" })
+        expect(onSelect).toHaveBeenCalledTimes(1)
+
+        fireEvent.keyDown(card, { key: " " })
+        expect(onSelect).toHaveBeenCalledTimes(2)
     })
 
     it("shows featured badge when isFeatured is true and enabled", () => {
@@ -179,10 +200,54 @@ describe("ProjectCard Component", () => {
     })
 })
 
-describe("ProjectGrid Component", () => {
-    it("renders project cards for all items provided", () => {
-        render(<ProjectGrid projects={[mockSingleProject]} />)
+describe("ProjectModal Component", () => {
+    it("does not render when isOpen is false or project is null", () => {
+        const { queryByTestId } = render(<ProjectModal project={mockSingleProject} isOpen={false} onClose={vi.fn()} />)
+        expect(queryByTestId("project-modal")).toBeNull()
+    })
+
+    it("renders full project details, tags, media, and external action links when open", () => {
+        render(<ProjectModal project={mockSingleProject} isOpen={true} onClose={vi.fn()} />)
+
+        expect(screen.getByRole("dialog")).toBeInTheDocument()
         expect(screen.getByText("Test System Alpha")).toBeInTheDocument()
+        expect(
+            screen.getByText("A comprehensive deep dive description for modal exploration with detailed architecture."),
+        ).toBeInTheDocument()
+
+        // Action links
+        const demoLink = screen.getByRole("link", { name: /open live demo/i })
+        expect(demoLink).toHaveAttribute("href", "https://test-proj.demo.app")
+
+        const repoLink = screen.getByRole("link", { name: /view github repository/i })
+        expect(repoLink).toHaveAttribute("href", "https://github.com/daniyusk/test-proj")
+
+        const caseStudyLink = screen.getByRole("link", { name: /read case study/i })
+        expect(caseStudyLink).toHaveAttribute("href", "https://daniyusk.dev/cases/test-proj")
+    })
+
+    it("calls onClose when clicking close button or pressing Escape", () => {
+        const onClose = vi.fn()
+        render(<ProjectModal project={mockSingleProject} isOpen={true} onClose={onClose} />)
+
+        const closeBtn = screen.getByRole("button", { name: /close project modal/i })
+        fireEvent.click(closeBtn)
+        expect(onClose).toHaveBeenCalledTimes(1)
+
+        fireEvent.keyDown(window, { key: "Escape" })
+        expect(onClose).toHaveBeenCalledTimes(2)
+    })
+})
+
+describe("ProjectGrid Component", () => {
+    it("renders project cards and forwards selection handler", () => {
+        const onSelect = vi.fn()
+        render(<ProjectGrid projects={[mockSingleProject]} onSelectProject={onSelect} />)
+
+        expect(screen.getByText("Test System Alpha")).toBeInTheDocument()
+        const card = screen.getByRole("button", { name: /view details for test system alpha/i })
+        fireEvent.click(card)
+        expect(onSelect).toHaveBeenCalledWith(mockSingleProject)
     })
 
     it("displays empty state message when list is empty", () => {
@@ -192,7 +257,7 @@ describe("ProjectGrid Component", () => {
 })
 
 describe("FeaturedProjectsSection Component", () => {
-    it("renders featured heading, featured projects, and CTA link to /projects", () => {
+    it("renders featured heading, featured project slides, and CTA link to /projects", () => {
         render(
             <MemoryRouter>
                 <FeaturedProjectsSection />
@@ -204,6 +269,21 @@ describe("FeaturedProjectsSection Component", () => {
 
         const links = screen.getAllByRole("link", { name: /view all projects/i })
         expect(links[0]).toHaveAttribute("href", "/projects")
+    })
+
+    it("renders accordion gallery and opens project modal on click", () => {
+        render(
+            <MemoryRouter>
+                <FeaturedProjectsSection />
+            </MemoryRouter>,
+        )
+
+        // Default active is project 1 (Orbital 3D Engine & UI), clicking it opens modal
+        const projectPanel = screen.getByRole("button", { name: /project: orbital 3d engine & ui/i })
+        fireEvent.click(projectPanel)
+
+        // Modal should now be open
+        expect(screen.getByRole("dialog")).toBeInTheDocument()
     })
 })
 
@@ -247,5 +327,19 @@ describe("Projects Page Component", () => {
 
         expect(screen.getByText("Orbital 3D Engine & UI")).toBeInTheDocument()
         expect(screen.queryByText("Nexus Flow Collaborative Canvas")).not.toBeInTheDocument()
+    })
+
+    it("opens ProjectModal when clicking on a project card in the grid", () => {
+        render(
+            <MemoryRouter>
+                <Projects />
+            </MemoryRouter>,
+        )
+
+        const firstCard = screen.getByRole("button", { name: /view details for orbital 3d engine & ui/i })
+        fireEvent.click(firstCard)
+
+        expect(screen.getByRole("dialog")).toBeInTheDocument()
+        expect(screen.getByText("Overview & Architecture")).toBeInTheDocument()
     })
 })

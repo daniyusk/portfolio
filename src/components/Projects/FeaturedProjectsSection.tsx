@@ -1,16 +1,20 @@
 import gsap from "gsap"
-import { ArrowRight, Sparkles } from "lucide-react"
-import { useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
-import { SpecularButton } from "@/components/Buttons"
-import { ProjectGrid } from "@/components/ProjectGrid"
+import { ArrowUpRight } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { AccordionGallery } from "@/components/AccordionGallery"
+import { ButtonLink } from "@/components/Buttons"
+import { ProjectModal } from "@/components/ProjectModal"
 import { getFeaturedProjects } from "@/data/projects"
+import type { Project } from "@/types/project"
 
 export function FeaturedProjectsSection() {
     const sectionRef = useRef<HTMLElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
     const featuredProjects = getFeaturedProjects()
 
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+
+    // Scroll reveal animation
     useEffect(() => {
         const section = sectionRef.current
         const header = headerRef.current
@@ -55,7 +59,7 @@ export function FeaturedProjectsSection() {
             ref={sectionRef}
             id="projects"
             aria-labelledby="featured-projects-title"
-            className="relative z-20 w-full bg-background min-h-screen py-24 sm:py-32 px-5 sm:px-8 lg:px-12 font-jetbrains"
+            className="relative z-20 min-h-screen w-full bg-background px-5 py-24 font-jetbrains sm:px-8 sm:py-32 lg:px-12"
         >
             {/* Full-width top gradient fade transitioning from Dither Hero into dark background */}
             <div
@@ -75,71 +79,64 @@ export function FeaturedProjectsSection() {
                 {/* Section Header */}
                 <div
                     ref={headerRef}
-                    className="mb-14 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end border-b border-white/10 pb-8"
+                    className="mb-10 flex flex-col items-start justify-between gap-7 border-b border-white/10 pb-8 sm:mb-12 sm:flex-row sm:items-end"
                 >
-                    <div className="space-y-3" data-featured-reveal>
-                        <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-300">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            <span>Selected Work</span>
-                        </div>
+                    <div className="max-w-2xl" data-featured-reveal>
                         <h2
                             id="featured-projects-title"
-                            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white"
+                            className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
                         >
                             Featured Projects
                         </h2>
-                        <p className="max-w-xl text-xs sm:text-sm text-zinc-400">
-                            A curated selection of production apps, open-source libraries, and interactive engineering
-                            experiments.
+                        <p className="mt-4 max-w-xl text-xs leading-relaxed text-zinc-400 sm:text-sm">
+                            A selection of projects crafted by me, spanning from interactive games to full-scale
+                            software systems.
                         </p>
                     </div>
 
                     <div data-featured-reveal className="w-full sm:w-auto">
-                        <Link
-                            to="/projects"
-                            className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all duration-200 hover:border-violet-500/50 hover:bg-violet-600/20 hover:text-violet-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                        <ButtonLink
+                            href="/projects"
+                            variant="secondary"
+                            className="w-full min-h-11 whitespace-nowrap text-xs sm:w-auto sm:text-sm"
                         >
                             <span>View all projects</span>
-                            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                        </Link>
+                            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </ButtonLink>
                     </div>
                 </div>
 
-                {/* Featured Projects Grid */}
-                <div data-featured-reveal>
-                    <ProjectGrid projects={featuredProjects} columns={3} showFeaturedBadge={false} />
-                </div>
-
-                {/* Bottom CTA Banner */}
-                <div
-                    data-featured-reveal
-                    className="mt-16 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-zinc-950/40 p-8 text-center backdrop-blur-xl sm:flex-row sm:text-left"
-                >
-                    <div className="space-y-1">
-                        <h3 className="text-base sm:text-lg font-bold text-white">
-                            Looking for more experiments & repositories?
-                        </h3>
-                        <p className="text-xs sm:text-sm text-zinc-400">
-                            Explore the complete catalog with tags, interactive media previews, and live architectures.
-                        </p>
+                {/* ReactBits 3D Accordion Gallery Showcase */}
+                {featuredProjects.length > 0 && (
+                    <div data-featured-reveal>
+                        <AccordionGallery
+                            projects={featuredProjects}
+                            defaultIndex={0}
+                            accentColor="#a78bfa"
+                            overlayColor="#09090b"
+                            height={470}
+                            gap={10}
+                            radius={18}
+                            expandRatio={0.58}
+                            tilt={3}
+                            parallax={0.35}
+                            duration={0.65}
+                            ease="power3.out"
+                            trigger="hover"
+                            showLabels={true}
+                            grayscale={true}
+                            onSelectProject={(project) => setSelectedProject(project)}
+                        />
                     </div>
-                    <Link to="/projects">
-                        <SpecularButton
-                            size="md"
-                            radius={12}
-                            textColor="#ffffff"
-                            lineColor="#c4b5fd"
-                            baseColor="#7c3aed"
-                            className="whitespace-nowrap font-jetbrains text-xs sm:text-sm"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span>View all projects</span>
-                                <ArrowRight className="h-4 w-4" />
-                            </span>
-                        </SpecularButton>
-                    </Link>
-                </div>
+                )}
             </div>
+
+            {/* Project Details Modal */}
+            <ProjectModal
+                project={selectedProject}
+                isOpen={Boolean(selectedProject)}
+                onClose={() => setSelectedProject(null)}
+            />
         </section>
     )
 }

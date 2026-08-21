@@ -60,6 +60,7 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
                     src={media.url}
                     poster={media.thumbnailUrl}
                     controls
+                    muted
                     playsInline
                     preload="metadata"
                     aria-label={media.alt || `${title || "Project"} preview video`}

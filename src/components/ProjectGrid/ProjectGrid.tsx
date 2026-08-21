@@ -11,6 +11,7 @@ export interface ProjectGridProps {
     className?: string
     showFeaturedBadge?: boolean
     emptyMessage?: string
+    onSelectProject?: (project: Project) => void
 }
 
 export function ProjectGrid({
@@ -19,6 +20,7 @@ export function ProjectGrid({
     className,
     showFeaturedBadge = true,
     emptyMessage = "No projects found matching your criteria.",
+    onSelectProject,
 }: ProjectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null)
 
@@ -81,8 +83,14 @@ export function ProjectGrid({
                 className,
             )}
         >
-            {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} showFeaturedBadge={showFeaturedBadge} />
+            {projects.map((project, index) => (
+                <ProjectCard
+                    key={project.id}
+                    project={project}
+                    index={index}
+                    showFeaturedBadge={showFeaturedBadge}
+                    onSelect={onSelectProject}
+                />
             ))}
         </div>
     )

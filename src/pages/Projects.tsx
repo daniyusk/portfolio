@@ -1,17 +1,19 @@
 import gsap from "gsap"
-import { ArrowLeft, Code2, Layers, RotateCcw, Search, Sparkles, X } from "lucide-react"
+import { ArrowLeft, RotateCcw, Search, X } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { ButtonLink } from "@/components/Buttons"
 import { ContactSection } from "@/components/ContactSection"
 import { Dither } from "@/components/Dither"
 import { ProjectGrid } from "@/components/ProjectGrid"
+import { ProjectModal } from "@/components/ProjectModal"
 import { getAllProjects, getAllTags } from "@/data/projects"
+import type { Project } from "@/types/project"
 
 export function Projects() {
     const pageRef = useRef<HTMLElement>(null)
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedTag, setSelectedTag] = useState<string | null>(null)
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
     const allProjects = useMemo(() => getAllProjects(), [])
     const allTags = useMemo(() => getAllTags(), [])
@@ -24,7 +26,8 @@ export function Projects() {
             const matchesSearch =
                 query === "" ||
                 project.title.toLowerCase().includes(query) ||
-                project.description.toLowerCase().includes(query) ||
+                project.shortDescription.toLowerCase().includes(query) ||
+                project.fullDescription.toLowerCase().includes(query) ||
                 project.tags.some((tag) => tag.toLowerCase().includes(query))
 
             return matchesTag && matchesSearch
@@ -63,43 +66,44 @@ export function Projects() {
             ref={pageRef}
             className="relative isolate min-h-screen overflow-x-hidden bg-background font-jetbrains text-white"
         >
-            <Dither />
+            <Dither disableAnimation className="!absolute !inset-x-0 !top-0 !bottom-auto h-[46rem] opacity-65" />
 
-            {/* Background glowing gradients */}
+            {/* Fade the project intro into the quieter directory surface */}
             <div
                 aria-hidden="true"
-                className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(124,58,237,0.12)_0%,transparent_60%)]"
+                className="pointer-events-none absolute inset-x-0 top-[31rem] z-[1] h-64 bg-gradient-to-b from-transparent via-background/75 to-background"
             />
 
-            <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
+            <div className="relative z-10 mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
                 {/* Navigation Header */}
-                <div className="mb-10 flex items-center justify-between" data-page-reveal>
+                <div className="mb-16 flex items-center justify-between sm:mb-24" data-page-reveal>
                     <Link
                         to="/"
-                        className="group inline-flex items-center gap-2 rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-2 text-xs font-semibold text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-violet-500/40 hover:bg-zinc-900/60 hover:text-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                        className="group inline-flex min-h-11 items-center gap-2 rounded-[14px] border border-white/10 bg-zinc-950/45 px-4 py-2 text-xs font-semibold text-zinc-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md transition-all duration-200 hover:border-violet-300/30 hover:bg-violet-950/30 hover:text-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-300"
                     >
                         <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
                         <span>Back to Home</span>
                     </Link>
 
-                    <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs text-violet-300">
-                        <Code2 className="h-3.5 w-3.5" />
-                        <span>Projects Directory</span>
+                    <div className="text-right text-[0.62rem] font-semibold tracking-[0.16em] text-violet-300 uppercase sm:text-xs">
+                        <span className="hidden sm:inline">Daniyusk / </span>
+                        <span>Projects</span>
                     </div>
                 </div>
 
                 {/* Page Title & Description */}
-                <div className="mb-12 space-y-4 max-w-3xl" data-page-reveal>
-                    <div className="inline-flex items-center gap-2 rounded-md bg-zinc-900/80 px-2.5 py-1 text-xs text-zinc-400 border border-white/10">
-                        <Layers className="h-3.5 w-3.5 text-violet-400" />
-                        <span>Architectures & Open Source</span>
+                <div className="mb-14 max-w-3xl sm:mb-20" data-page-reveal>
+                    <div className="mb-5 flex items-center gap-3 text-[0.68rem] font-semibold tracking-[0.2em] text-violet-300 uppercase">
+                        <span>02</span>
+                        <span aria-hidden="true" className="h-px w-10 bg-violet-400/60" />
+                        <span>Project archive</span>
                     </div>
 
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
                         All Projects & Experiments
                     </h1>
 
-                    <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
+                    <p className="mt-5 max-w-2xl text-sm leading-relaxed text-zinc-300 sm:text-base">
                         A comprehensive gallery of frontend systems, distributed backends, 3D WebGL renderers, and
                         developer tooling crafted with modern web technologies.
                     </p>
@@ -108,18 +112,18 @@ export function Projects() {
                 {/* Search & Tag Filter Toolbar */}
                 <div
                     data-page-reveal
-                    className="mb-10 flex flex-col gap-6 rounded-2xl border border-white/10 bg-zinc-950/60 p-5 backdrop-blur-xl sm:p-6"
+                    className="mb-10 flex flex-col gap-5 border-y border-white/10 bg-background/65 py-5 backdrop-blur-xl sm:py-6"
                 >
                     {/* Search Input and Counter */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="relative flex-1 max-w-md">
+                        <div className="relative max-w-lg flex-1">
                             <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search by title, description, or stack..."
-                                className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-2.5 pl-10 pr-10 text-xs sm:text-sm text-white placeholder-zinc-500 outline-none transition-colors duration-200 focus:border-violet-500/60 focus:bg-zinc-900 focus:ring-2 focus:ring-violet-500/20"
+                                className="w-full rounded-[14px] border border-white/10 bg-zinc-950/65 py-3 pl-10 pr-10 text-xs text-white outline-none transition-colors duration-200 placeholder:text-zinc-600 focus:border-violet-300/40 focus:bg-zinc-950 focus:ring-2 focus:ring-violet-500/15 sm:text-sm"
                             />
                             {searchQuery && (
                                 <button
@@ -133,7 +137,7 @@ export function Projects() {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-3 text-xs text-zinc-400">
+                        <div className="flex items-center justify-between gap-3 text-xs text-zinc-500 sm:justify-end">
                             <span>
                                 Showing <strong className="text-white font-semibold">{filteredProjects.length}</strong>{" "}
                                 of <strong className="text-white font-semibold">{allProjects.length}</strong> projects
@@ -143,7 +147,7 @@ export function Projects() {
                                 <button
                                     type="button"
                                     onClick={handleClearFilters}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                                    className="inline-flex items-center gap-1.5 border-b border-white/20 px-1 py-1 text-xs text-zinc-300 transition-colors hover:border-violet-300/60 hover:text-white"
                                 >
                                     <RotateCcw className="h-3 w-3" />
                                     <span>Reset</span>
@@ -153,16 +157,18 @@ export function Projects() {
                     </div>
 
                     {/* Tag Filter Pills */}
-                    <div className="flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">
-                        <span className="text-xs font-semibold text-zinc-400 mr-1">Tags:</span>
+                    <div className="flex items-center gap-2 overflow-x-auto border-t border-white/10 pt-4 pb-1 md:flex-wrap md:overflow-visible">
+                        <span className="mr-1 shrink-0 text-[0.65rem] font-semibold tracking-[0.14em] text-zinc-500 uppercase">
+                            Filter
+                        </span>
 
                         <button
                             type="button"
                             onClick={() => setSelectedTag(null)}
-                            className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                                 selectedTag === null
-                                    ? "bg-violet-600 text-white shadow-[0_0_12px_rgba(124,58,237,0.4)]"
-                                    : "border border-white/10 bg-zinc-900/50 text-zinc-400 hover:border-white/20 hover:text-zinc-200"
+                                    ? "bg-violet-600/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]"
+                                    : "border border-white/10 bg-zinc-950/55 text-zinc-400 hover:border-white/20 hover:text-zinc-200"
                             }`}
                         >
                             All ({allProjects.length})
@@ -177,10 +183,10 @@ export function Projects() {
                                     key={tag}
                                     type="button"
                                     onClick={() => setSelectedTag(isSelected ? null : tag)}
-                                    className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+                                    className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                                         isSelected
-                                            ? "bg-violet-600 text-white shadow-[0_0_12px_rgba(124,58,237,0.4)]"
-                                            : "border border-white/10 bg-zinc-900/50 text-zinc-400 hover:border-violet-500/30 hover:bg-violet-500/10 hover:text-violet-300"
+                                            ? "bg-violet-600/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]"
+                                            : "border border-white/10 bg-zinc-950/55 text-zinc-400 hover:border-violet-300/30 hover:bg-violet-950/25 hover:text-violet-200"
                                     }`}
                                 >
                                     {tag} ({count})
@@ -191,11 +197,12 @@ export function Projects() {
                 </div>
 
                 {/* Main Projects Grid */}
-                <div data-page-reveal className="mb-20">
+                <div data-page-reveal className="mb-28">
                     <ProjectGrid
                         projects={filteredProjects}
                         columns={3}
                         showFeaturedBadge={true}
+                        onSelectProject={setSelectedProject}
                         emptyMessage={
                             searchQuery || selectedTag
                                 ? `No projects found matching "${searchQuery || selectedTag}".`
@@ -203,34 +210,17 @@ export function Projects() {
                         }
                     />
                 </div>
-
-                {/* CTA Box back to Home & Contact */}
-                <div
-                    data-page-reveal
-                    className="mb-24 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-gradient-to-r from-zinc-950/80 via-zinc-900/60 to-zinc-950/80 p-8 backdrop-blur-xl sm:flex-row"
-                >
-                    <div className="space-y-1 text-center sm:text-left">
-                        <div className="inline-flex items-center gap-1.5 text-xs text-violet-400 font-semibold mb-1">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            <span>Collaboration & Inquiries</span>
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-bold text-white">
-                            Have an idea or custom project in mind?
-                        </h3>
-                        <p className="text-xs sm:text-sm text-zinc-400 max-w-xl">
-                            Feel free to reach out via GitHub, LinkedIn, or Discord to discuss architecture, frontend
-                            development, or open-source initiatives.
-                        </p>
-                    </div>
-
-                    <ButtonLink href="/#contact" variant="primary" className="whitespace-nowrap">
-                        Get in Touch
-                    </ButtonLink>
-                </div>
             </div>
 
             {/* Footer Contact Section */}
             <ContactSection />
+
+            {/* Project Details Modal */}
+            <ProjectModal
+                project={selectedProject}
+                isOpen={Boolean(selectedProject)}
+                onClose={() => setSelectedProject(null)}
+            />
         </main>
     )
 }

@@ -9,7 +9,6 @@ export interface ProjectGridProps {
     projects: Project[]
     columns?: 2 | 3
     className?: string
-    showFeaturedBadge?: boolean
     emptyMessage?: string
     onSelectProject?: (project: Project) => void
 }
@@ -18,7 +17,6 @@ export function ProjectGrid({
     projects,
     columns = 3,
     className,
-    showFeaturedBadge = true,
     emptyMessage = "No projects found matching your criteria.",
     onSelectProject,
 }: ProjectGridProps) {
@@ -83,14 +81,8 @@ export function ProjectGrid({
                 className,
             )}
         >
-            {projects.map((project, index) => (
-                <ProjectCard
-                    key={project.id}
-                    project={project}
-                    index={index}
-                    showFeaturedBadge={showFeaturedBadge}
-                    onSelect={onSelectProject}
-                />
+            {projects.map((project) => (
+                <ProjectCard key={project.id} project={project} onSelect={onSelectProject} />
             ))}
         </div>
     )

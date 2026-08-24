@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
 import { MediaViewer } from "@/components/MediaViewer"
@@ -18,6 +18,7 @@ vi.mock("@/components/Dither", () => ({
 const mockSingleProject: Project = {
     id: "test-proj",
     title: "Test System Alpha",
+    category: "Web Applications",
     shortDescription: "A concise test summary for cards.",
     fullDescription: "A comprehensive deep dive description for modal exploration with detailed architecture.",
     isFeatured: true,
@@ -48,6 +49,7 @@ describe("Projects Data Model & Helpers", () => {
         for (const project of projectsData) {
             expect(project.id).toBeTruthy()
             expect(project.title).toBeTruthy()
+            expect(project.category).toBeTruthy()
             expect(project.shortDescription).toBeTruthy()
             expect(project.fullDescription).toBeTruthy()
             expect(typeof project.isFeatured).toBe("boolean")
@@ -103,7 +105,7 @@ describe("MediaViewer Component", () => {
         const img = screen.getByRole("img", { name: /preview picture/i })
         expect(img).toBeInTheDocument()
         expect(img).toHaveAttribute("src", "https://example.com/pic.jpg")
-        expect(screen.getByText("IMG")).toBeInTheDocument()
+        expect(screen.queryByText("IMG")).not.toBeInTheDocument()
     })
 
     it("renders video element with controls and muted playback", () => {
@@ -194,9 +196,70 @@ describe("ProjectCard Component", () => {
         expect(onSelect).toHaveBeenCalledTimes(2)
     })
 
-    it("shows featured badge when isFeatured is true and enabled", () => {
-        render(<ProjectCard project={mockSingleProject} showFeaturedBadge={true} />)
-        expect(screen.getByText("Featured")).toBeInTheDocument()
+    it("does not render numeric or featured indexing labels", () => {
+        render(<ProjectCard project={mockSingleProject} />)
+        expect(screen.queryByText("Featured")).not.toBeInTheDocument()
+        expect(screen.queryByText("01")).not.toBeInTheDocument()
+    })
+
+    it("plays video previews only while hovered and resets them afterward", () => {
+        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
+        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
+        const videoProject: Project = {
+            ...mockSingleProject,
+            media: [
+                {
+                    type: "video",
+                    url: "https://example.com/demo.mp4",
+                    thumbnailUrl: "https://example.com/poster.jpg",
+                    alt: "Static video preview",
+                },
+            ],
+        }
+
+        const { container } = render(<ProjectCard project={videoProject} />)
+        const video = container.querySelector("video")
+        const card = screen.getByRole("button", { name: /view details for test system alpha/i })
+
+        expect(video).not.toHaveAttribute("autoplay")
+        expect(video).toHaveAttribute("loop")
+        expect(video?.muted).toBe(true)
+
+        fireEvent.mouseEnter(card)
+        expect(play).toHaveBeenCalledTimes(1)
+
+        fireEvent.mouseLeave(card)
+        expect(pause).toHaveBeenCalledTimes(1)
+        expect(video?.currentTime).toBe(0)
+
+        play.mockRestore()
+        pause.mockRestore()
+    })
+
+    it("keeps GIF thumbnails static until hover", () => {
+        const gifProject: Project = {
+            ...mockSingleProject,
+            media: [
+                {
+                    type: "gif",
+                    url: "https://example.com/animated.gif",
+                    thumbnailUrl: "https://example.com/frozen.jpg",
+                    alt: "Frozen GIF preview",
+                },
+            ],
+        }
+
+        const { container } = render(<ProjectCard project={gifProject} />)
+        const card = screen.getByRole("button", { name: /view details for test system alpha/i })
+
+        expect(container.querySelectorAll("img")).toHaveLength(1)
+        expect(container.querySelector("img")).toHaveAttribute("src", "https://example.com/frozen.jpg")
+
+        fireEvent.mouseEnter(card)
+        expect(container.querySelectorAll("img")).toHaveLength(2)
+
+        fireEvent.mouseLeave(card)
+        expect(container.querySelectorAll("img")).toHaveLength(1)
     })
 })
 
@@ -211,9 +274,10 @@ describe("ProjectModal Component", () => {
 
         expect(screen.getByRole("dialog")).toBeInTheDocument()
         expect(screen.getByText("Test System Alpha")).toBeInTheDocument()
-        expect(
-            screen.getByText("A comprehensive deep dive description for modal exploration with detailed architecture."),
-        ).toBeInTheDocument()
+        expect(screen.queryByText(/featured project/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/project archive/i)).not.toBeInTheDocument()
+        expect(screen.getByText("A concise test summary for cards.")).toBeInTheDocument()
+        expect(screen.queryByText(/overview & architecture/i)).not.toBeInTheDocument()
 
         // Action links
         const demoLink = screen.getByRole("link", { name: /open live demo/i })
@@ -285,48 +349,55 @@ describe("FeaturedProjectsSection Component", () => {
         // Modal should now be open
         expect(screen.getByRole("dialog")).toBeInTheDocument()
     })
+
+    it("requires two touches to open the selected accordion project", () => {
+        render(
+            <MemoryRouter>
+                <FeaturedProjectsSection />
+            </MemoryRouter>,
+        )
+
+        const projectPanel = screen.getByRole("button", { name: /project: nexus flow collaborative canvas/i })
+        fireEvent.pointerDown(projectPanel, { pointerType: "touch" })
+        fireEvent.focus(projectPanel)
+        fireEvent.click(projectPanel)
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+        expect(projectPanel).toHaveAttribute("aria-current", "true")
+
+        fireEvent.pointerDown(projectPanel, { pointerType: "touch" })
+        fireEvent.click(projectPanel)
+        expect(screen.getByRole("dialog")).toBeInTheDocument()
+    })
 })
 
 describe("Projects Page Component", () => {
-    it("renders full projects page with title, search bar, and tags", () => {
+    it("renders the category carousels without search or filter controls", () => {
         render(
             <MemoryRouter>
                 <Projects />
             </MemoryRouter>,
         )
 
-        expect(screen.getByRole("heading", { name: /all projects & experiments/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /^projects$/i, level: 1 })).toBeInTheDocument()
         expect(screen.getByRole("link", { name: /back to home/i })).toHaveAttribute("href", "/")
-        expect(screen.getByPlaceholderText(/search by title/i)).toBeInTheDocument()
+        expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+        expect(screen.queryByText(/^filter$/i)).not.toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /interactive experiences/i })).toBeInTheDocument()
+        expect(screen.getByRole("button", { name: /next projects in web applications/i })).toBeInTheDocument()
     })
 
-    it("filters projects when typing into search input", () => {
+    it("moves keyboard focus between cards with arrow keys", () => {
         render(
             <MemoryRouter>
                 <Projects />
             </MemoryRouter>,
         )
 
-        const input = screen.getByPlaceholderText(/search by title/i)
-        fireEvent.change(input, { target: { value: "HyperTerminal" } })
-
-        expect(screen.getByText("HyperTerminal Cloud Shell")).toBeInTheDocument()
-        expect(screen.queryByText("Orbital 3D Engine & UI")).not.toBeInTheDocument()
-    })
-
-    it("filters projects when clicking on a tag button", () => {
-        render(
-            <MemoryRouter>
-                <Projects />
-            </MemoryRouter>,
-        )
-
-        // Find the tag button for 'Three.js'
-        const threeJsButtons = screen.getAllByRole("button", { name: /three\.js/i })
-        fireEvent.click(threeJsButtons[0])
-
-        expect(screen.getByText("Orbital 3D Engine & UI")).toBeInTheDocument()
-        expect(screen.queryByText("Nexus Flow Collaborative Canvas")).not.toBeInTheDocument()
+        const firstCard = screen.getByRole("button", { name: /view details for orbital 3d engine & ui/i })
+        const nextCard = screen.getByRole("button", { name: /view details for pulse spatial audio synthesizer/i })
+        firstCard.focus()
+        fireEvent.keyDown(firstCard, { key: "ArrowRight" })
+        expect(nextCard).toHaveFocus()
     })
 
     it("opens ProjectModal when clicking on a project card in the grid", () => {
@@ -339,7 +410,8 @@ describe("Projects Page Component", () => {
         const firstCard = screen.getByRole("button", { name: /view details for orbital 3d engine & ui/i })
         fireEvent.click(firstCard)
 
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-        expect(screen.getByText("Overview & Architecture")).toBeInTheDocument()
+        const dialog = screen.getByRole("dialog")
+        expect(dialog).toBeInTheDocument()
+        expect(within(dialog).getByText(projectsData[0].shortDescription)).toBeInTheDocument()
     })
 })

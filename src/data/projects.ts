@@ -4,6 +4,7 @@ export const projectsData: Project[] = [
     {
         id: "orbital-ui",
         title: "Orbital 3D Engine & UI",
+        category: "Interactive Experiences",
         shortDescription:
             "Interactive WebGL component library and generative shader engine built for high-performance creative web applications.",
         fullDescription:
@@ -38,6 +39,7 @@ export const projectsData: Project[] = [
     {
         id: "nexus-flow",
         title: "Nexus Flow Collaborative Canvas",
+        category: "Web Applications",
         shortDescription:
             "Real-time collaborative canvas with CRDT synchronization and sub-10ms distributed event streaming.",
         fullDescription:
@@ -71,6 +73,7 @@ export const projectsData: Project[] = [
     {
         id: "hyperterminal-cli",
         title: "HyperTerminal Cloud Shell",
+        category: "Tools / CLI",
         shortDescription:
             "Browser-native high-performance terminal emulator with WebAssembly micro-containers and AI command completions.",
         fullDescription:
@@ -97,6 +100,7 @@ export const projectsData: Project[] = [
     {
         id: "aura-observability",
         title: "Aura Microservices Observability",
+        category: "Web Applications",
         shortDescription:
             "Fullstack distributed tracing and metric telemetry suite supporting OpenTelemetry and automated anomaly detection.",
         fullDescription:
@@ -121,6 +125,7 @@ export const projectsData: Project[] = [
     {
         id: "spectra-agent",
         title: "Spectra Autonomous Refactoring Agent",
+        category: "Tools / CLI",
         shortDescription:
             "Context-aware AI refactoring engine performing AST transformations and automated multi-file semantic migrations.",
         fullDescription:
@@ -145,6 +150,7 @@ export const projectsData: Project[] = [
     {
         id: "pulse-dsp-audio",
         title: "Pulse Spatial Audio Synthesizer",
+        category: "Interactive Experiences",
         shortDescription:
             "Modular digital signal processing engine and polyphonic synthesizer running in WebAssembly audio worklets.",
         fullDescription:

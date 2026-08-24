@@ -4,11 +4,13 @@ import {
     type CSSProperties,
     type KeyboardEvent,
     type MouseEvent,
+    type PointerEvent,
     useCallback,
     useEffect,
     useRef,
     useState,
 } from "react"
+import { ProjectMediaPreview } from "@/components/ProjectMediaPreview"
 import { cn } from "@/styles/utils"
 import type { Project } from "@/types/project"
 
@@ -64,6 +66,8 @@ export function AccordionGallery({
     const tlRef = useRef<gsap.core.Timeline | null>(null)
     const firstRunRef = useRef(true)
     const mediaSizeRef = useRef(420)
+    const lastPointerTypeRef = useRef<string | null>(null)
+    const touchArmedIndexRef = useRef<number | null>(null)
 
     const count = projects.length
     const [active, setActive] = useState(() => Math.min(Math.max(defaultIndex, 0), Math.max(0, count - 1)))
@@ -190,6 +194,25 @@ export function AccordionGallery({
     }
 
     const handleClick = (i: number, e: MouseEvent, project: Project) => {
+        const isTouchInteraction = lastPointerTypeRef.current === "touch" || lastPointerTypeRef.current === "pen"
+
+        if (isTouchInteraction) {
+            if (touchArmedIndexRef.current !== i) {
+                e.preventDefault()
+                touchArmedIndexRef.current = i
+                setActive(i)
+                lastPointerTypeRef.current = null
+                return
+            }
+
+            touchArmedIndexRef.current = null
+            lastPointerTypeRef.current = null
+            onSelectProject?.(project)
+            return
+        }
+
+        lastPointerTypeRef.current = null
+
         if (i !== active) {
             e.preventDefault()
             setActive(i)
@@ -197,6 +220,10 @@ export function AccordionGallery({
             // Already active, click opens details modal
             onSelectProject?.(project)
         }
+    }
+
+    const handlePointerDown = (e: PointerEvent) => {
+        lastPointerTypeRef.current = e.pointerType
     }
 
     const handleKeyDown = (i: number, e: KeyboardEvent, project: Project) => {
@@ -236,17 +263,18 @@ export function AccordionGallery({
                     <button
                         key={project.id}
                         type="button"
+                        data-project-preview-trigger
                         ref={(el) => {
                             panelRefs.current[i] = el
                         }}
                         className={cn(
-                            "group relative block min-h-0 min-w-0 flex-[1_1_0] cursor-pointer overflow-hidden border border-white/10 bg-zinc-950 p-0 text-left no-underline outline-none",
+                            "group relative block min-h-0 min-w-0 flex-[1_1_0] cursor-pointer overflow-hidden bg-zinc-950 p-0 text-left no-underline outline-none",
                             "[transform-style:preserve-3d] [transform-origin:center]",
-                            "shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] duration-300",
+                            "shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] transition-shadow duration-300",
                             isActive
-                                ? "border-violet-400/45 shadow-[0_20px_50px_rgba(76,29,149,0.16)]"
-                                : "hover:border-white/30",
-                            "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400",
+                                ? "shadow-[0_20px_50px_rgba(76,29,149,0.2)]"
+                                : "hover:shadow-[0_18px_46px_rgba(0,0,0,0.72)]",
+                            "focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-4 focus-visible:ring-offset-background",
                             "max-[640px]:min-h-[96px] max-[640px]:!transform-none",
                         )}
                         style={
@@ -257,8 +285,13 @@ export function AccordionGallery({
                             } as CSSProperties
                         }
                         onClick={(e) => handleClick(i, e, project)}
+                        onPointerDown={handlePointerDown}
                         onMouseEnter={() => handleEnter(i)}
-                        onFocus={() => setActive(i)}
+                        onFocus={() => {
+                            if (lastPointerTypeRef.current !== "touch" && lastPointerTypeRef.current !== "pen") {
+                                setActive(i)
+                            }
+                        }}
                         onKeyDown={(e) => handleKeyDown(i, e, project)}
                         aria-current={isActive ? "true" : undefined}
                         aria-label={`Project: ${project.title}`}
@@ -277,24 +310,7 @@ export function AccordionGallery({
                                 }}
                             >
                                 {primaryMedia ? (
-                                    primaryMedia.type === "video" ? (
-                                        <video
-                                            src={primaryMedia.url}
-                                            poster={primaryMedia.thumbnailUrl}
-                                            autoPlay
-                                            muted
-                                            loop
-                                            playsInline
-                                            className="block h-full w-full select-none object-cover"
-                                        />
-                                    ) : (
-                                        <img
-                                            src={primaryMedia.thumbnailUrl || primaryMedia.url}
-                                            alt={primaryMedia.alt || project.title}
-                                            draggable={false}
-                                            className="pointer-events-none block h-full w-full select-none object-cover"
-                                        />
-                                    )
+                                    <ProjectMediaPreview media={primaryMedia} title={project.title} />
                                 ) : (
                                     <div className="h-full w-full bg-zinc-900" />
                                 )}
@@ -308,53 +324,43 @@ export function AccordionGallery({
                             />
                         </div>
 
-                        {/* Active Content Overlay (Title, Description, Tags, Action CTA) */}
+                        {/* Active Content Overlay (Title, Tags, Circular Action Button) */}
                         {showLabels && (
                             <div
                                 ref={(el) => {
                                     contentRefs.current[i] = el
                                 }}
-                                className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end space-y-3 p-5 opacity-0 sm:p-7 md:p-8"
+                                className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 p-5 opacity-0 sm:p-7 md:p-8"
                             >
-                                {/* Accent Bar + Title */}
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className="h-6 w-1 flex-none rounded-full"
-                                        style={{
-                                            background: accentColor,
-                                            boxShadow: `0 0 12px color-mix(in srgb, ${accentColor} 80%, transparent)`,
-                                        }}
-                                    />
+                                <div className="min-w-0 flex-1 space-y-2.5">
+                                    {/* Title */}
                                     <h3
-                                        className="truncate font-bold text-lg tracking-tight drop-shadow-md sm:text-xl md:text-2xl lg:text-3xl"
+                                        className="truncate font-extrabold text-xl tracking-tight drop-shadow-md sm:text-2xl lg:text-3xl"
                                         style={{ color: textColor }}
                                     >
                                         {project.title}
                                     </h3>
+
+                                    {/* Tech Tags - Fully rounded without outline */}
+                                    <div className="flex flex-wrap gap-2 pt-0.5">
+                                        {project.tags.slice(0, 4).map((tag) => (
+                                            <span
+                                                key={tag}
+                                                className="inline-flex items-center rounded-full bg-violet-950/85 px-3 py-1 font-medium text-[0.7rem] text-violet-200 shadow-sm backdrop-blur-md"
+                                            >
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
 
-                                {/* Short Description */}
-                                <p className="line-clamp-2 max-w-2xl font-jetbrains text-xs text-zinc-300 drop-shadow sm:text-sm">
-                                    {project.shortDescription}
-                                </p>
-
-                                {/* Tech Tags */}
-                                <div className="flex flex-wrap gap-1.5 pt-1">
-                                    {project.tags.slice(0, 4).map((tag) => (
-                                        <span
-                                            key={tag}
-                                            className="inline-flex items-center rounded-md border border-violet-400/25 bg-violet-950/70 px-2.5 py-0.5 font-semibold text-[0.7rem] text-violet-200 backdrop-blur-md"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                {/* Project action */}
-                                <div className="pt-2">
-                                    <span className="inline-flex items-center gap-2 border-b border-violet-300/60 pb-1 text-xs font-semibold text-white transition-colors duration-200 group-hover:text-violet-200 sm:text-sm">
-                                        <span>Open project</span>
-                                        <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                {/* Circular Action Button with Icon */}
+                                <div className="shrink-0">
+                                    <span
+                                        aria-hidden="true"
+                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-600/90 text-white shadow-[0_4px_20px_rgba(124,58,237,0.45)] backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-violet-500 group-hover:shadow-[0_4px_25px_rgba(124,58,237,0.7)]"
+                                    >
+                                        <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                     </span>
                                 </div>
                             </div>

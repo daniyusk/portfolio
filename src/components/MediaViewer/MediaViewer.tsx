@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Film, ImageIcon, Play, RefreshCw } from "lucide-react"
+import { ChevronLeft, ChevronRight, Film, ImageIcon, RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/styles/utils"
 import type { ProjectMedia } from "@/types/project"
@@ -148,13 +148,6 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
         >
             {/* Active Media Component with Key for automatic state re-initialization */}
             <SingleMediaView key={currentMedia.url} media={currentMedia} title={title} />
-
-            {/* Media Type Badge */}
-            <div className="pointer-events-none absolute top-2.5 right-2.5 z-20 flex items-center gap-1 rounded-md bg-zinc-950/80 px-2 py-0.5 font-jetbrains text-[0.65rem] font-semibold tracking-wider text-violet-300 backdrop-blur-md border border-white/10 shadow-sm uppercase">
-                {currentMedia.type === "video" && <Play className="h-2.5 w-2.5 fill-current" />}
-                {currentMedia.type === "gif" && <span className="font-bold">GIF</span>}
-                {currentMedia.type === "image" && <span>IMG</span>}
-            </div>
 
             {/* Multiple media indicators and navigation */}
             {media.length > 1 && (

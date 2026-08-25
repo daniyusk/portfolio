@@ -55,7 +55,7 @@ export function ProjectCard({ project, onSelect, onNavigate, className }: Projec
                 {/* Full-bleed visual asset */}
                 <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
                     {primaryMedia ? (
-                        <ProjectMediaPreview media={primaryMedia} title={project.title} />
+                        <ProjectMediaPreview media={primaryMedia} cover={project.cover} title={project.title} />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-zinc-900 text-zinc-600 text-xs">
                             No preview

@@ -4,12 +4,23 @@ interface ProjectMediaBase {
     url: string
     alt: string
     caption?: string
+    fitMode?: "cover" | "contain"
+}
+
+export interface PlaybackRange {
+    start: number
+    end: number
 }
 
 export type ProjectMedia = ProjectMediaBase &
     (
         | { type: "image"; thumbnailUrl?: string }
-        | { type: "video"; thumbnailUrl?: string }
+        | {
+              type: "video"
+              thumbnailUrl?: string
+              previewTimestamp?: number
+              playbackRange?: PlaybackRange
+          }
         | { type: "gif"; thumbnailUrl: string }
     )
 
@@ -19,7 +30,12 @@ export interface ProjectLinks {
     caseStudy?: string
 }
 
-export type ProjectCategory = "Interactive Experiences" | "Web Applications" | "Tools / CLI"
+export interface ProjectCover {
+    url: string
+    alt: string
+}
+
+export type ProjectCategory = "Roblox Games"
 
 export interface Project {
     id: string
@@ -27,6 +43,7 @@ export interface Project {
     category: ProjectCategory
     shortDescription: string
     fullDescription: string
+    cover?: ProjectCover
     isFeatured: boolean
     tags: string[]
     media: ProjectMedia[]

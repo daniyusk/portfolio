@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/styles/utils"
-import type { ProjectMedia } from "@/types/project"
+import type { ProjectCover, ProjectMedia } from "@/types/project"
+import { getPlaybackRange, getPreviewStart, seekVideo } from "@/utils/projectMedia"
 
 export interface ProjectMediaPreviewProps {
     media: ProjectMedia
+    cover?: ProjectCover
     title: string
     className?: string
 }
@@ -13,10 +15,14 @@ const prefersReducedMotion = () =>
     typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-export function ProjectMediaPreview({ media, title, className }: ProjectMediaPreviewProps) {
+export function ProjectMediaPreview({ media, cover, title, className }: ProjectMediaPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
+    const isPreviewActiveRef = useRef(false)
     const [isPlaying, setIsPlaying] = useState(false)
+    const videoMedia = media.type === "video" ? media : undefined
+    const previewStart = videoMedia ? getPreviewStart(videoMedia) : 0
+    const playbackRange = videoMedia ? getPlaybackRange(videoMedia) : undefined
 
     useEffect(() => {
         const container = containerRef.current
@@ -32,7 +38,9 @@ export function ProjectMediaPreview({ media, title, className }: ProjectMediaPre
                 const video = videoRef.current
                 if (!video) return
 
+                isPreviewActiveRef.current = true
                 video.muted = true
+                seekVideo(video, previewStart)
                 void video.play().catch(() => setIsPlaying(false))
             }
         }
@@ -43,12 +51,9 @@ export function ProjectMediaPreview({ media, title, className }: ProjectMediaPre
             const video = videoRef.current
             if (!video) return
 
+            isPreviewActiveRef.current = false
             video.pause()
-            try {
-                video.currentTime = 0
-            } catch {
-                // Some remote streams cannot seek until their metadata is available.
-            }
+            seekVideo(video, previewStart)
         }
 
         trigger.addEventListener("mouseenter", startPreview)
@@ -59,16 +64,18 @@ export function ProjectMediaPreview({ media, title, className }: ProjectMediaPre
             trigger.removeEventListener("mouseleave", resetPreview)
             resetPreview()
         }
-    }, [media])
+    }, [media, previewStart])
 
-    const staticSource = media.type === "video" ? media.thumbnailUrl : media.thumbnailUrl || media.url
+    const mediaFallback = media.type === "video" ? media.thumbnailUrl : media.thumbnailUrl || media.url
+    const staticSource = cover?.url || mediaFallback
+    const staticAlt = cover?.alt || media.alt || `${title} preview`
 
     return (
         <div ref={containerRef} className={cn("relative h-full w-full overflow-hidden bg-zinc-950", className)}>
             {staticSource && (
                 <img
                     src={staticSource}
-                    alt={media.alt || `${title} preview`}
+                    alt={staticAlt}
                     loading="lazy"
                     draggable={false}
                     className="pointer-events-none h-full w-full select-none object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.025]"
@@ -79,18 +86,28 @@ export function ProjectMediaPreview({ media, title, className }: ProjectMediaPre
                 <video
                     ref={videoRef}
                     src={media.url}
-                    poster={media.thumbnailUrl}
+                    poster={cover?.url || media.thumbnailUrl}
                     muted
                     loop
                     playsInline
                     preload="metadata"
-                    aria-label={media.thumbnailUrl ? undefined : media.alt || `${title} preview video`}
-                    aria-hidden={media.thumbnailUrl ? "true" : undefined}
+                    aria-label={staticSource ? undefined : media.alt || `${title} preview video`}
+                    aria-hidden={staticSource ? "true" : undefined}
                     tabIndex={-1}
+                    onLoadedMetadata={(event) => seekVideo(event.currentTarget, previewStart)}
+                    onTimeUpdate={(event) => {
+                        if (
+                            isPreviewActiveRef.current &&
+                            playbackRange &&
+                            event.currentTarget.currentTime >= playbackRange.end
+                        ) {
+                            seekVideo(event.currentTarget, playbackRange.start)
+                        }
+                    }}
                     className={cn(
                         "pointer-events-none absolute inset-0 h-full w-full select-none object-cover",
                         "motion-safe:transition-opacity motion-safe:duration-200",
-                        isPlaying || !media.thumbnailUrl ? "opacity-100" : "opacity-0",
+                        isPlaying || !staticSource ? "opacity-100" : "opacity-0",
                     )}
                 />
             )}

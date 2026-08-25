@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react"
+import { act, fireEvent, render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
 import { MediaViewer } from "@/components/MediaViewer"
@@ -18,7 +18,7 @@ vi.mock("@/components/Dither", () => ({
 const mockSingleProject: Project = {
     id: "test-proj",
     title: "Test System Alpha",
-    category: "Web Applications",
+    category: "Roblox Games",
     shortDescription: "A concise test summary for cards.",
     fullDescription: "A comprehensive deep dive description for modal exploration with detailed architecture.",
     isFeatured: true,
@@ -32,7 +32,7 @@ const mockSingleProject: Project = {
         },
         {
             type: "video",
-            url: "https://example.com/demo.mp4",
+            url: "https://example.com/demo.webm",
             alt: "Test Project Demo Video",
         },
     ],
@@ -44,8 +44,9 @@ const mockSingleProject: Project = {
 }
 
 describe("Projects Data Model & Helpers", () => {
-    it("provides a valid mock dataset with 5 to 6 projects", () => {
-        expect(projectsData.length).toBeGreaterThanOrEqual(5)
+    it("provides the two real Roblox projects", () => {
+        expect(projectsData).toHaveLength(2)
+        expect(projectsData.map((project) => project.id)).toEqual(["steal-a-garden", "project-far"])
         for (const project of projectsData) {
             expect(project.id).toBeTruthy()
             expect(project.title).toBeTruthy()
@@ -72,19 +73,40 @@ describe("Projects Data Model & Helpers", () => {
     })
 
     it("getProjectById returns the correct project or undefined", () => {
-        const project = getProjectById("orbital-ui")
+        const project = getProjectById("steal-a-garden")
         expect(project).toBeDefined()
-        expect(project?.title).toBe("Orbital 3D Engine & UI")
+        expect(project?.title).toBe("Steal a Garden")
 
         const nonExistent = getProjectById("non-existent-id")
         expect(nonExistent).toBeUndefined()
     })
 
+    it("registers the Roblox projects with local video previews and posters", () => {
+        const stealAGarden = getProjectById("steal-a-garden")
+        const projectFar = getProjectById("project-far")
+
+        expect(stealAGarden?.media).toHaveLength(1)
+        expect(stealAGarden?.cover?.url).toBe("/media/projects/steal-a-garden-cover.webp")
+        expect(stealAGarden?.media[0]?.url).toBe("/media/projects/steal-a-garden-combat.webm")
+        expect(stealAGarden?.media[0]?.thumbnailUrl).toBe("/media/projects/steal-a-garden-combat.webp")
+        expect(stealAGarden?.media[0]).toMatchObject({
+            fitMode: "contain",
+            previewTimestamp: 2.5,
+            playbackRange: { start: 2, end: 16 },
+        })
+
+        expect(projectFar?.media).toHaveLength(2)
+        expect(projectFar?.cover?.url).toBe("/media/projects/project-far-cover.webp")
+        expect(projectFar?.media.every((media) => media.type === "video" && Boolean(media.thumbnailUrl))).toBe(true)
+        expect(projectFar?.media.some((media) => media.url === projectFar.cover?.url)).toBe(false)
+    })
+
     it("getAllTags returns sorted unique tags across all projects", () => {
         const tags = getAllTags()
         expect(tags.length).toBeGreaterThan(0)
-        expect(tags.includes("React")).toBe(true)
-        expect(tags.includes("TypeScript")).toBe(true)
+        expect(tags.includes("Roblox")).toBe(true)
+        expect(tags.includes("Luau")).toBe(true)
+        expect(tags).toEqual([...tags].sort())
     })
 })
 
@@ -108,14 +130,18 @@ describe("MediaViewer Component", () => {
         expect(screen.queryByText("IMG")).not.toBeInTheDocument()
     })
 
-    it("renders video element with controls and muted playback", () => {
+    it("renders custom play/pause and audio controls without native video controls", () => {
+        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
+        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
         const { container } = render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/video.mp4",
+                        url: "https://example.com/video.webm",
                         alt: "Preview video",
+                        fitMode: "contain",
+                        thumbnailUrl: "https://example.com/video.webp",
                     },
                 ]}
             />,
@@ -123,8 +149,144 @@ describe("MediaViewer Component", () => {
 
         const video = container.querySelector("video")
         expect(video).toBeInTheDocument()
-        expect(video).toHaveAttribute("src", "https://example.com/video.mp4")
+        expect(video).toHaveAttribute("src", "https://example.com/video.webm")
+        expect(video).not.toHaveAttribute("controls")
         expect(video?.muted).toBe(true)
+        expect(video).toHaveClass("object-contain")
+        expect(container.querySelector('img[aria-hidden="true"]')).toHaveAttribute(
+            "src",
+            "https://example.com/video.webp",
+        )
+
+        fireEvent.click(screen.getByRole("button", { name: /play video/i }))
+        expect(play).toHaveBeenCalledTimes(1)
+
+        fireEvent.play(video as HTMLVideoElement)
+        fireEvent.click(screen.getByRole("button", { name: /pause video/i }))
+        expect(pause).toHaveBeenCalledTimes(1)
+
+        fireEvent.click(screen.getByRole("button", { name: /unmute video/i }))
+        expect(video?.muted).toBe(false)
+
+        play.mockRestore()
+        pause.mockRestore()
+    })
+
+    it("keeps modal playback inside the configured range", () => {
+        const { container } = render(
+            <MediaViewer
+                media={[
+                    {
+                        type: "video",
+                        url: "https://example.com/ranged.webm",
+                        alt: "Ranged preview",
+                        playbackRange: { start: 3, end: 8 },
+                    },
+                ]}
+            />,
+        )
+        const video = container.querySelector("video") as HTMLVideoElement
+
+        fireEvent.loadedMetadata(video)
+        expect(video.currentTime).toBe(3)
+
+        video.currentTime = 8
+        fireEvent.timeUpdate(video)
+        expect(video.currentTime).toBe(3)
+    })
+
+    it("seeks within the playback range and shows the proportional hover timestamp", () => {
+        const { container } = render(
+            <MediaViewer
+                media={[
+                    {
+                        type: "video",
+                        url: "https://example.com/timeline.webm",
+                        thumbnailUrl: "https://example.com/timeline.webp",
+                        alt: "Timeline preview",
+                        playbackRange: { start: 2, end: 12 },
+                    },
+                ]}
+            />,
+        )
+        const video = container.querySelector("video") as HTMLVideoElement
+        const slider = screen.getByRole("slider", { name: /video progress/i })
+        const timeline = screen.getByTestId("video-timeline")
+
+        expect(slider).toHaveAttribute("min", "2")
+        expect(slider).toHaveAttribute("max", "12")
+
+        fireEvent.change(slider, { target: { value: "7" } })
+        expect(video.currentTime).toBe(7)
+
+        Object.defineProperty(timeline, "getBoundingClientRect", {
+            configurable: true,
+            value: () => ({ left: 0, width: 100 }),
+        })
+        fireEvent.pointerDown(timeline, { clientX: 25, pointerId: 1, pointerType: "mouse" })
+        expect(video.currentTime).toBe(4.5)
+
+        fireEvent.pointerMove(timeline, { clientX: 75, pointerType: "mouse" })
+
+        expect(screen.getByText("0:09")).toBeInTheDocument()
+        expect(container.querySelector('img[src="https://example.com/timeline.webp"]')).toBeInTheDocument()
+    })
+
+    it("toggles playback with the Space key", () => {
+        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
+        render(
+            <MediaViewer
+                media={[
+                    {
+                        type: "video",
+                        url: "https://example.com/keyboard.webm",
+                        alt: "Keyboard preview",
+                    },
+                ]}
+            />,
+        )
+
+        fireEvent.keyDown(screen.getByRole("button", { name: /play video/i }), { key: " ", code: "Space" })
+        expect(play).toHaveBeenCalledTimes(1)
+
+        play.mockRestore()
+    })
+
+    it("reveals hidden mobile controls on the first touch and pauses on the second", () => {
+        vi.useFakeTimers()
+        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
+        render(
+            <MediaViewer
+                media={[
+                    {
+                        type: "video",
+                        url: "https://example.com/touch.webm",
+                        alt: "Touch preview",
+                        playbackRange: { start: 1, end: 6 },
+                    },
+                ]}
+            />,
+        )
+
+        const video = screen.getByLabelText(/touch preview/i)
+        fireEvent.play(video)
+        act(() => vi.advanceTimersByTime(3000))
+
+        const surface = screen.getByRole("button", { name: /pause video/i })
+        const slider = screen.getByRole("slider", { name: /video progress/i })
+        expect(slider).toHaveAttribute("tabindex", "-1")
+
+        fireEvent.pointerDown(surface, { pointerType: "touch" })
+        fireEvent.click(surface, { detail: 1 })
+        expect(pause).not.toHaveBeenCalled()
+        expect(slider).toHaveAttribute("tabindex", "0")
+
+        fireEvent.pointerDown(surface, { pointerType: "touch" })
+        fireEvent.click(surface, { detail: 1 })
+        expect(pause).toHaveBeenCalledTimes(1)
+
+        pause.mockRestore()
+        vi.useRealTimers()
     })
 
     it("displays error fallback on asset load error", () => {
@@ -207,12 +369,19 @@ describe("ProjectCard Component", () => {
         const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
         const videoProject: Project = {
             ...mockSingleProject,
+            cover: {
+                url: "https://example.com/cover.jpg",
+                alt: "Dedicated project cover",
+            },
             media: [
                 {
                     type: "video",
-                    url: "https://example.com/demo.mp4",
+                    url: "https://example.com/demo.webm",
                     thumbnailUrl: "https://example.com/poster.jpg",
                     alt: "Static video preview",
+                    fitMode: "contain",
+                    previewTimestamp: 3,
+                    playbackRange: { start: 2, end: 7 },
                 },
             ],
         }
@@ -224,13 +393,26 @@ describe("ProjectCard Component", () => {
         expect(video).not.toHaveAttribute("autoplay")
         expect(video).toHaveAttribute("loop")
         expect(video?.muted).toBe(true)
+        expect(video).toHaveClass("object-cover")
+        expect(video).toHaveAttribute("poster", "https://example.com/cover.jpg")
+        const cover = screen.getByRole("img", { name: /dedicated project cover/i })
+        expect(cover).toHaveClass("object-cover")
+        expect(cover).toHaveAttribute("src", "https://example.com/cover.jpg")
+        expect(container.querySelectorAll("img")).toHaveLength(1)
 
         fireEvent.mouseEnter(card)
         expect(play).toHaveBeenCalledTimes(1)
+        expect(video?.currentTime).toBe(3)
+
+        if (video) {
+            video.currentTime = 7
+            fireEvent.timeUpdate(video)
+            expect(video.currentTime).toBe(2)
+        }
 
         fireEvent.mouseLeave(card)
         expect(pause).toHaveBeenCalledTimes(1)
-        expect(video?.currentTime).toBe(0)
+        expect(video?.currentTime).toBe(3)
 
         play.mockRestore()
         pause.mockRestore()
@@ -301,6 +483,18 @@ describe("ProjectModal Component", () => {
         fireEvent.keyDown(window, { key: "Escape" })
         expect(onClose).toHaveBeenCalledTimes(2)
     })
+
+    it("keeps the card cover out of the modal media gallery", () => {
+        const projectFar = getProjectById("project-far")
+        expect(projectFar).toBeDefined()
+
+        render(<ProjectModal project={projectFar ?? null} isOpen={true} onClose={vi.fn()} />)
+        const video = screen.getByLabelText(/project far reactive main menu/i)
+
+        expect(video).toHaveAttribute("src", "/media/projects/project-far-menu.webm")
+        expect(video).toHaveAttribute("poster", "/media/projects/project-far-menu.webp")
+        expect(screen.queryByRole("img", { name: /project far logo cover/i })).not.toBeInTheDocument()
+    })
 })
 
 describe("ProjectGrid Component", () => {
@@ -342,8 +536,8 @@ describe("FeaturedProjectsSection Component", () => {
             </MemoryRouter>,
         )
 
-        // Default active is project 1 (Orbital 3D Engine & UI), clicking it opens modal
-        const projectPanel = screen.getByRole("button", { name: /project: orbital 3d engine & ui/i })
+        // Default active is the first featured project, clicking it opens the modal.
+        const projectPanel = screen.getByRole("button", { name: /project: steal a garden/i })
         fireEvent.click(projectPanel)
 
         // Modal should now be open
@@ -357,7 +551,7 @@ describe("FeaturedProjectsSection Component", () => {
             </MemoryRouter>,
         )
 
-        const projectPanel = screen.getByRole("button", { name: /project: nexus flow collaborative canvas/i })
+        const projectPanel = screen.getByRole("button", { name: /project: project: far/i })
         fireEvent.pointerDown(projectPanel, { pointerType: "touch" })
         fireEvent.focus(projectPanel)
         fireEvent.click(projectPanel)
@@ -382,8 +576,8 @@ describe("Projects Page Component", () => {
         expect(screen.getByRole("link", { name: /back to home/i })).toHaveAttribute("href", "/")
         expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
         expect(screen.queryByText(/^filter$/i)).not.toBeInTheDocument()
-        expect(screen.getByRole("heading", { name: /interactive experiences/i })).toBeInTheDocument()
-        expect(screen.getByRole("button", { name: /next projects in web applications/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /roblox games/i })).toBeInTheDocument()
+        expect(screen.getByRole("button", { name: /next projects in roblox games/i })).toBeInTheDocument()
     })
 
     it("moves keyboard focus between cards with arrow keys", () => {
@@ -393,8 +587,8 @@ describe("Projects Page Component", () => {
             </MemoryRouter>,
         )
 
-        const firstCard = screen.getByRole("button", { name: /view details for orbital 3d engine & ui/i })
-        const nextCard = screen.getByRole("button", { name: /view details for pulse spatial audio synthesizer/i })
+        const firstCard = screen.getByRole("button", { name: /view details for steal a garden/i })
+        const nextCard = screen.getByRole("button", { name: /view details for project: far/i })
         firstCard.focus()
         fireEvent.keyDown(firstCard, { key: "ArrowRight" })
         expect(nextCard).toHaveFocus()
@@ -407,11 +601,11 @@ describe("Projects Page Component", () => {
             </MemoryRouter>,
         )
 
-        const firstCard = screen.getByRole("button", { name: /view details for orbital 3d engine & ui/i })
+        const firstCard = screen.getByRole("button", { name: /view details for steal a garden/i })
         fireEvent.click(firstCard)
 
         const dialog = screen.getByRole("dialog")
         expect(dialog).toBeInTheDocument()
-        expect(within(dialog).getByText(projectsData[0].shortDescription)).toBeInTheDocument()
+        expect(within(dialog).getByText(getProjectById("steal-a-garden")?.shortDescription ?? "")).toBeInTheDocument()
     })
 })

@@ -78,6 +78,21 @@ body {
     }
 }
 
+@keyframes media-feedback {
+    0% {
+        opacity: 0;
+        transform: scale(0.72);
+    }
+    18% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.12);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

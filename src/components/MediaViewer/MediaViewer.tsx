@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, Film, ImageIcon, RefreshCw } from "lucide-react"
 import { useState } from "react"
+import { VideoPlayer } from "@/components/MediaViewer/VideoPlayer"
 import { cn } from "@/styles/utils"
 import type { ProjectMedia } from "@/types/project"
 
@@ -47,7 +48,7 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
     return (
         <div className="relative h-full w-full">
             {isLoading && (
-                <div className="absolute inset-0 z-10 flex animate-pulse items-center justify-center bg-zinc-900/90 backdrop-blur-sm">
+                <div className="absolute inset-0 z-50 flex animate-pulse items-center justify-center bg-zinc-900/90 backdrop-blur-sm">
                     <div className="flex items-center gap-2 font-jetbrains text-xs text-zinc-400">
                         <RefreshCw className="h-4 w-4 animate-spin text-violet-400" />
                         <span>Loading asset...</span>
@@ -56,41 +57,42 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
             )}
 
             {media.type === "video" ? (
-                <video
-                    src={media.url}
-                    poster={media.thumbnailUrl}
-                    controls
-                    muted
-                    playsInline
-                    preload="metadata"
-                    aria-label={media.alt || `${title || "Project"} preview video`}
+                <VideoPlayer
+                    media={media}
+                    title={title}
+                    isLoading={isLoading}
                     onLoadedData={() => setIsLoading(false)}
                     onError={() => {
                         setIsLoading(false)
                         setHasError(true)
                     }}
-                    className={cn(
-                        "h-full w-full object-cover transition-opacity duration-300",
-                        isLoading ? "opacity-0" : "opacity-100",
-                    )}
-                >
-                    <track kind="captions" />
-                </video>
-            ) : (
-                <img
-                    src={media.url}
-                    alt={media.alt || `${title || "Project"} preview image`}
-                    loading="lazy"
-                    onLoad={() => setIsLoading(false)}
-                    onError={() => {
-                        setIsLoading(false)
-                        setHasError(true)
-                    }}
-                    className={cn(
-                        "h-full w-full object-cover transition-all duration-500 group-hover/media:scale-105",
-                        isLoading ? "opacity-0" : "opacity-100",
-                    )}
                 />
+            ) : (
+                <>
+                    {media.fitMode === "contain" && (
+                        <img
+                            src={media.thumbnailUrl || media.url}
+                            alt=""
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -inset-8 h-[calc(100%+4rem)] w-[calc(100%+4rem)] scale-110 object-cover opacity-25 blur-2xl saturate-150"
+                        />
+                    )}
+                    <img
+                        src={media.url}
+                        alt={media.alt || `${title || "Project"} preview image`}
+                        loading="lazy"
+                        onLoad={() => setIsLoading(false)}
+                        onError={() => {
+                            setIsLoading(false)
+                            setHasError(true)
+                        }}
+                        className={cn(
+                            "relative h-full w-full transition-all duration-500 group-hover/media:scale-105",
+                            media.fitMode === "contain" ? "object-contain" : "object-cover",
+                            isLoading ? "opacity-0" : "opacity-100",
+                        )}
+                    />
+                </>
             )}
         </div>
     )
@@ -172,7 +174,7 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
                     </button>
 
                     {/* Pagination Dots */}
-                    <div className="absolute bottom-2.5 inset-x-0 z-20 flex items-center justify-center gap-1.5">
+                    <div className="absolute top-3 inset-x-0 z-20 flex items-center justify-center gap-1.5">
                         {media.map((item, idx) => (
                             <button
                                 key={item.url}

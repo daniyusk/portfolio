@@ -40,7 +40,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
 
             if (e.key === "Tab") {
                 const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-                    'a[href], button:not([disabled]), video[controls], [tabindex]:not([tabindex="-1"])',
+                    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
                 )
                 if (!focusable?.length) return
 

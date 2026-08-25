@@ -310,7 +310,11 @@ export function AccordionGallery({
                                 }}
                             >
                                 {primaryMedia ? (
-                                    <ProjectMediaPreview media={primaryMedia} title={project.title} />
+                                    <ProjectMediaPreview
+                                        media={primaryMedia}
+                                        cover={project.cover}
+                                        title={project.title}
+                                    />
                                 ) : (
                                     <div className="h-full w-full bg-zinc-900" />
                                 )}

@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/Buttons"
 import { ContactSection } from "@/components/ContactSection"
 import { Dither } from "@/components/Dither"
 import { ProfileTilt } from "@/components/ProfileTilt"
+import { FeaturedProjectsSection } from "@/components/Projects"
 import { typography } from "@/components/Typography"
 
 export function Home() {
@@ -137,6 +138,8 @@ export function Home() {
                     className="pointer-events-none absolute bottom-0 inset-x-0 w-full h-48 bg-gradient-to-t from-background via-background/70 to-transparent z-10"
                 />
             </div>
+
+            <FeaturedProjectsSection />
 
             <ContactSection />
         </main>

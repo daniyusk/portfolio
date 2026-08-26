@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
 import { ButtonLink } from "@/components/Buttons"
 import { ProfileTilt } from "@/components/ProfileTilt"
@@ -11,7 +12,11 @@ vi.mock("@/components/Dither", () => ({
 
 describe("Smoke Tests - Core Components", () => {
     it("renders Home page with title and navigation buttons", () => {
-        render(<Home />)
+        render(
+            <MemoryRouter>
+                <Home />
+            </MemoryRouter>,
+        )
 
         expect(screen.getByRole("heading", { name: /daniyusk/i })).toBeInTheDocument()
         expect(screen.getByRole("link", { name: /view projects/i })).toHaveAttribute("href", "#projects")
@@ -40,7 +45,11 @@ describe("Smoke Tests - Core Components", () => {
     })
 
     it("renders ContactSection with pixel art links and heading", () => {
-        render(<Home />)
+        render(
+            <MemoryRouter>
+                <Home />
+            </MemoryRouter>,
+        )
 
         expect(screen.getByRole("heading", { name: /let's build something togheter/i })).toBeInTheDocument()
         expect(screen.getByRole("link", { name: /linkedin/i })).toHaveAttribute(

@@ -63,9 +63,6 @@ describe("Smoke Tests - Core Components", () => {
             "href",
             "https://discord.com/users/670030102490382346",
         )
-        expect(screen.getByRole("link", { name: /email/i })).toHaveAttribute(
-            "href",
-            "mailto:daniyusk.dev@gmail.com",
-        )
+        expect(screen.getByRole("link", { name: /email/i })).toHaveAttribute("href", "mailto:daniyusk.dev@gmail.com")
     })
 })

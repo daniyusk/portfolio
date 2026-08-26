@@ -73,7 +73,7 @@ describe("Smoke Tests - Core Components", () => {
             </MemoryRouter>,
         )
 
-        expect(screen.getByRole("heading", { name: /engineering systems with logic/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /^about me$/i })).toBeInTheDocument()
         expect(screen.getAllByText(/cotuca \(unicamp\)/i).length).toBeGreaterThan(0)
         expect(screen.getByText(/2x bronze medalist/i)).toBeInTheDocument()
         expect(screen.getByText(/silver medalist/i)).toBeInTheDocument()

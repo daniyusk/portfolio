@@ -539,9 +539,7 @@ describe("ProjectGrid Component", () => {
 
 describe("AccordionGallery Component", () => {
     it("renders project panels and ensures full-bleed media container on vertical/mobile layouts", () => {
-        const { container } = render(
-            <AccordionGallery projects={[mockSingleProject]} orientation="vertical" />,
-        )
+        const { container } = render(<AccordionGallery projects={[mockSingleProject]} orientation="vertical" />)
 
         const panel = screen.getByRole("button", { name: /project: test system alpha/i })
         expect(panel).toBeInTheDocument()

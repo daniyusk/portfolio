@@ -70,12 +70,28 @@ export function AccordionGallery({
     const touchArmedIndexRef = useRef<number | null>(null)
 
     const count = projects.length
+    const [isMobile, setIsMobile] = useState(() =>
+        typeof window !== "undefined" && typeof window.matchMedia === "function"
+            ? window.matchMedia("(max-width: 640px)").matches
+            : false,
+    )
     const [active, setActive] = useState(() => Math.min(Math.max(defaultIndex, 0), Math.max(0, count - 1)))
 
     const prefersReduced =
         typeof window !== "undefined" && window.matchMedia
             ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
             : false
+
+    useEffect(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") return
+        const mq = window.matchMedia("(max-width: 640px)")
+        const update = () => setIsMobile(mq.matches)
+        update()
+        mq.addEventListener("change", update)
+        return () => mq.removeEventListener("change", update)
+    }, [])
+
+    const isVerticalLayout = orientation === "vertical" || isMobile
 
     const overlayBg = `linear-gradient(180deg, transparent 20%, color-mix(in srgb, ${overlayColor} 82%, transparent) 85%, ${overlayColor} 100%), color-mix(in srgb, ${overlayColor} calc(var(--ag-dim, 0.4) * 100%), transparent)`
 
@@ -99,27 +115,45 @@ export function AccordionGallery({
                 const content = contentRefs.current[i]
 
                 const rot = isActive ? 0 : i < active ? tilt : -tilt
-                const rotProp = { rotateY: rot }
+                const rotProp = isVerticalLayout ? { rotateY: 0, rotateX: 0 } : { rotateY: rot }
 
                 tl.to(panel, { flexGrow: isActive ? grow : 1, ...rotProp, duration: dur, ease }, 0)
 
                 if (media) {
-                    const drift = Math.max(-1.5, Math.min(1.5, active - i))
-                    const shift = drift * parallax * mediaSize * 0.05
                     const gray = grayscale ? (isActive ? 0 : 1) : 0
-                    tl.to(
-                        media,
-                        {
-                            xPercent: -50,
-                            yPercent: -50,
-                            x: isActive ? 0 : shift,
-                            "--ag-gray": gray,
-                            "--ag-dim": isActive ? 0 : 0.45,
-                            duration: dur,
-                            ease,
-                        },
-                        0,
-                    )
+                    if (isVerticalLayout) {
+                        tl.to(
+                            media,
+                            {
+                                xPercent: 0,
+                                yPercent: 0,
+                                x: 0,
+                                y: 0,
+                                "--ag-gray": gray,
+                                "--ag-dim": isActive ? 0 : 0.45,
+                                duration: dur,
+                                ease,
+                            },
+                            0,
+                        )
+                    } else {
+                        const drift = Math.max(-1.5, Math.min(1.5, active - i))
+                        const shift = drift * parallax * mediaSize * 0.05
+                        tl.to(
+                            media,
+                            {
+                                xPercent: -50,
+                                yPercent: -50,
+                                x: isActive ? 0 : shift,
+                                y: 0,
+                                "--ag-gray": gray,
+                                "--ag-dim": isActive ? 0 : 0.45,
+                                duration: dur,
+                                ease,
+                            },
+                            0,
+                        )
+                    }
                 }
 
                 if (showLabels && content) {
@@ -154,7 +188,20 @@ export function AccordionGallery({
 
             tlRef.current = tl
         },
-        [active, count, expandRatio, duration, ease, tilt, parallax, grayscale, showLabels, stagger, prefersReduced],
+        [
+            active,
+            count,
+            expandRatio,
+            duration,
+            ease,
+            tilt,
+            parallax,
+            grayscale,
+            showLabels,
+            stagger,
+            prefersReduced,
+            isVerticalLayout,
+        ],
     )
 
     useEffect(() => {
@@ -252,7 +299,7 @@ export function AccordionGallery({
             )}
             style={{
                 gap: `${gap}px`,
-                height: orientation === "vertical" ? `${Math.round(height * 1.6)}px` : `${height}px`,
+                height: isVerticalLayout ? `${Math.max(Math.round(height * 1.25), 520)}px` : `${height}px`,
             }}
         >
             {projects.map((project, i) => {
@@ -270,7 +317,7 @@ export function AccordionGallery({
                         className={cn(
                             "group relative block min-h-0 min-w-0 flex-[1_1_0] cursor-pointer overflow-hidden bg-zinc-950 p-0 text-left no-underline outline-none",
                             "[transform-style:preserve-3d] [transform-origin:center]",
-                            "max-[640px]:min-h-[96px] max-[640px]:!transform-none",
+                            "max-[640px]:min-h-[72px] max-[640px]:!transform-none",
                         )}
                         style={
                             {
@@ -297,9 +344,14 @@ export function AccordionGallery({
                                 ref={(el) => {
                                     mediaRefs.current[i] = el
                                 }}
-                                className="absolute top-1/2 left-1/2 [filter:grayscale(var(--ag-gray,1))]"
+                                className={cn(
+                                    "absolute [filter:grayscale(var(--ag-gray,1))]",
+                                    isVerticalLayout
+                                        ? "inset-0 h-full w-full max-[640px]:!inset-0 max-[640px]:!h-full max-[640px]:!w-full"
+                                        : "top-1/2 left-1/2 min-w-full",
+                                )}
                                 style={{
-                                    width: "var(--ag-media-size, 420px)",
+                                    width: isVerticalLayout ? "100%" : "max(100%, var(--ag-media-size, 420px))",
                                     height: "100%",
                                     willChange: "transform, filter",
                                 }}
@@ -309,6 +361,7 @@ export function AccordionGallery({
                                         media={primaryMedia}
                                         cover={project.cover}
                                         title={project.title}
+                                        className="h-full w-full"
                                     />
                                 ) : (
                                     <div className="h-full w-full bg-zinc-900" />

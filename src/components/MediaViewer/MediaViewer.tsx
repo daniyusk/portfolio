@@ -137,27 +137,73 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
 
 export function MediaViewer({ media, className, aspectRatio = "aspect-video", title }: MediaViewerProps) {
     const [currentIndex, setCurrentIndex] = useState(0)
+    const touchStartXRef = useRef<number | null>(null)
+    const touchStartYRef = useRef<number | null>(null)
+    const touchDeltaXRef = useRef(0)
+    const touchDeltaYRef = useRef(0)
 
     const currentMedia: ProjectMedia | undefined = media[currentIndex]
 
-    const handlePrev = (e: React.MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-        if (media.length <= 1) return
-        setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1))
-    }
+    const handlePrev = useCallback(
+        (e?: React.MouseEvent | React.TouchEvent) => {
+            if (e) {
+                e.stopPropagation()
+            }
+            if (media.length <= 1) return
+            setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1))
+        },
+        [media.length],
+    )
 
-    const handleNext = (e: React.MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-        if (media.length <= 1) return
-        setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1))
-    }
+    const handleNext = useCallback(
+        (e?: React.MouseEvent | React.TouchEvent) => {
+            if (e) {
+                e.stopPropagation()
+            }
+            if (media.length <= 1) return
+            setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1))
+        },
+        [media.length],
+    )
 
     const handleDotClick = (index: number, e: React.MouseEvent) => {
         e.stopPropagation()
         e.preventDefault()
         setCurrentIndex(index)
+    }
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (media.length <= 1) return
+        touchStartXRef.current = e.touches[0].clientX
+        touchStartYRef.current = e.touches[0].clientY
+        touchDeltaXRef.current = 0
+        touchDeltaYRef.current = 0
+    }
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (touchStartXRef.current === null || touchStartYRef.current === null) return
+        touchDeltaXRef.current = e.touches[0].clientX - touchStartXRef.current
+        touchDeltaYRef.current = e.touches[0].clientY - touchStartYRef.current
+    }
+
+    const handleTouchEnd = () => {
+        if (touchStartXRef.current === null || touchStartYRef.current === null) return
+        const dx = touchDeltaXRef.current
+        const dy = touchDeltaYRef.current
+        const minSwipeDistance = 35
+
+        if (Math.abs(dx) > minSwipeDistance && Math.abs(dx) > Math.abs(dy)) {
+            if (dx < 0) {
+                handleNext()
+            } else {
+                handlePrev()
+            }
+        }
+
+        touchStartXRef.current = null
+        touchStartYRef.current = null
+        touchDeltaXRef.current = 0
+        touchDeltaYRef.current = 0
     }
 
     if (!currentMedia || media.length === 0) {
@@ -179,8 +225,12 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
 
     return (
         <div
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
             className={cn(
-                "group/media relative w-full select-none overflow-hidden rounded-xl border border-white/5 bg-zinc-950/80",
+                "group/media relative w-full select-none overflow-hidden rounded-xl border border-white/5 bg-zinc-950/80 touch-pan-y",
                 aspectRatio,
                 className,
             )}
@@ -196,33 +246,39 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
                         type="button"
                         onClick={handlePrev}
                         aria-label="Previous preview media"
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-950/75 text-zinc-300 opacity-0 backdrop-blur-md transition-all duration-200 hover:bg-violet-600 hover:text-white group-hover/media:opacity-100 focus-visible:opacity-100"
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full border border-white/10 bg-black/65 text-zinc-200 backdrop-blur-md opacity-100 sm:opacity-0 sm:group-hover/media:opacity-100 focus-visible:opacity-100 transition-all duration-200 hover:border-white/20 hover:bg-violet-600 hover:text-white active:scale-90"
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
                     </button>
 
                     <button
                         type="button"
                         onClick={handleNext}
                         aria-label="Next preview media"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-950/75 text-zinc-300 opacity-0 backdrop-blur-md transition-all duration-200 hover:bg-violet-600 hover:text-white group-hover/media:opacity-100 focus-visible:opacity-100"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full border border-white/10 bg-black/65 text-zinc-200 backdrop-blur-md opacity-100 sm:opacity-0 sm:group-hover/media:opacity-100 focus-visible:opacity-100 transition-all duration-200 hover:border-white/20 hover:bg-violet-600 hover:text-white active:scale-90"
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
                     </button>
 
                     {/* Pagination Dots */}
-                    <div className="absolute top-3 inset-x-0 z-20 flex items-center justify-center gap-1.5">
+                    <div className="absolute top-3 inset-x-0 z-20 flex items-center justify-center gap-1.5 pointer-events-auto">
                         {media.map((item, idx) => (
                             <button
                                 key={item.url}
                                 type="button"
                                 onClick={(e) => handleDotClick(idx, e)}
                                 aria-label={`Go to slide ${idx + 1}`}
-                                className={cn(
-                                    "h-1.5 rounded-full transition-all duration-200",
-                                    idx === currentIndex ? "w-5 bg-violet-400" : "w-1.5 bg-white/40 hover:bg-white/70",
-                                )}
-                            />
+                                className="flex items-center justify-center p-1"
+                            >
+                                <span
+                                    className={cn(
+                                        "block h-1.5 rounded-full transition-all duration-200",
+                                        idx === currentIndex
+                                            ? "w-5 bg-violet-400"
+                                            : "w-1.5 bg-white/40 hover:bg-white/70",
+                                    )}
+                                />
+                            </button>
                         ))}
                     </div>
                 </>

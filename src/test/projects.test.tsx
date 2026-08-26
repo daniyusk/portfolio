@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
+import { AccordionGallery } from "@/components/AccordionGallery"
 import { MediaViewer } from "@/components/MediaViewer"
 import { ProjectCard } from "@/components/ProjectCard"
 import { ProjectGrid } from "@/components/ProjectGrid"
@@ -300,17 +301,32 @@ describe("MediaViewer Component", () => {
         expect(screen.getByText(/no media available/i)).toBeInTheDocument()
     })
 
-    it("navigates between multiple media assets", () => {
-        render(<MediaViewer media={mockSingleProject.media} />)
+    it("navigates between multiple media assets using arrows and touch swipe gestures", () => {
+        const { container } = render(<MediaViewer media={mockSingleProject.media} />)
 
         // Starts on first media (image)
         expect(screen.getByRole("img", { name: /test project screenshot/i })).toBeInTheDocument()
 
-        // Click next arrow
         const nextButton = screen.getByRole("button", { name: /next preview media/i })
-        fireEvent.click(nextButton)
+        const prevButton = screen.getByRole("button", { name: /previous preview media/i })
+        expect(nextButton).toHaveClass("opacity-100", "sm:opacity-0")
+        expect(prevButton).toHaveClass("opacity-100", "sm:opacity-0")
 
-        // Moves to second media (video)
+        // Click next arrow -> moves to second media (video)
+        fireEvent.click(nextButton)
+        expect(screen.getByRole("region", { name: /test project demo video/i })).toBeInTheDocument()
+
+        // Swipe right on container -> moves back to first media
+        const viewerRoot = container.firstElementChild as HTMLElement
+        fireEvent.touchStart(viewerRoot, { touches: [{ clientX: 100, clientY: 100 }] })
+        fireEvent.touchMove(viewerRoot, { touches: [{ clientX: 180, clientY: 105 }] })
+        fireEvent.touchEnd(viewerRoot)
+        expect(screen.getByRole("img", { name: /test project screenshot/i })).toBeInTheDocument()
+
+        // Swipe left on container -> advances to second media
+        fireEvent.touchStart(viewerRoot, { touches: [{ clientX: 200, clientY: 100 }] })
+        fireEvent.touchMove(viewerRoot, { touches: [{ clientX: 120, clientY: 102 }] })
+        fireEvent.touchEnd(viewerRoot)
         expect(screen.getByRole("region", { name: /test project demo video/i })).toBeInTheDocument()
     })
 })
@@ -518,6 +534,24 @@ describe("ProjectGrid Component", () => {
     it("displays empty state message when list is empty", () => {
         render(<ProjectGrid projects={[]} emptyMessage="Custom empty message." />)
         expect(screen.getByText("Custom empty message.")).toBeInTheDocument()
+    })
+})
+
+describe("AccordionGallery Component", () => {
+    it("renders project panels and ensures full-bleed media container on vertical/mobile layouts", () => {
+        const { container } = render(
+            <AccordionGallery projects={[mockSingleProject]} orientation="vertical" />,
+        )
+
+        const panel = screen.getByRole("button", { name: /project: test system alpha/i })
+        expect(panel).toBeInTheDocument()
+
+        const mediaViewport = container.querySelector(".absolute.inset-0.overflow-hidden")
+        expect(mediaViewport).toBeInTheDocument()
+
+        const mediaContainer = mediaViewport?.firstElementChild
+        expect(mediaContainer).toHaveClass("inset-0", "h-full", "w-full")
+        expect(mediaContainer).toHaveStyle({ width: "100%", height: "100%" })
     })
 })
 

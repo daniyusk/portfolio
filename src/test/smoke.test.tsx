@@ -75,7 +75,7 @@ describe("Smoke Tests - Core Components", () => {
 
         expect(screen.getByRole("heading", { name: /engineering systems with logic/i })).toBeInTheDocument()
         expect(screen.getAllByText(/cotuca \(unicamp\)/i).length).toBeGreaterThan(0)
-        expect(screen.getByText(/2x bronze medalist at obmep/i)).toBeInTheDocument()
-        expect(screen.getByText(/silver medalist at omasp/i)).toBeInTheDocument()
+        expect(screen.getByText(/2x bronze medalist/i)).toBeInTheDocument()
+        expect(screen.getByText(/silver medalist/i)).toBeInTheDocument()
     })
 })

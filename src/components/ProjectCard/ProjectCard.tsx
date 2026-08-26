@@ -41,7 +41,6 @@ export function ProjectCard({ project, onSelect, onNavigate, className }: Projec
             className={cn(
                 "group relative flex w-full cursor-pointer select-none flex-col overflow-hidden rounded-[20px] bg-zinc-950/70 text-left outline-none backdrop-blur-xl motion-safe:transition-all motion-safe:duration-300",
                 "motion-safe:hover:-translate-y-1 hover:bg-zinc-950/85",
-                "font-jetbrains",
                 className,
             )}
         >
@@ -87,13 +86,13 @@ export function ProjectCard({ project, onSelect, onNavigate, className }: Projec
                             {project.tags.slice(0, 4).map((tag) => (
                                 <span
                                     key={tag}
-                                    className="inline-flex items-center text-[0.66rem] font-medium text-violet-300"
+                                    className="inline-flex items-center font-jetbrains text-[0.66rem] font-medium text-violet-300"
                                 >
                                     {tag}
                                 </span>
                             ))}
                             {project.tags.length > 4 && (
-                                <span className="inline-flex items-center text-[0.65rem] text-zinc-500">
+                                <span className="inline-flex items-center font-jetbrains text-[0.65rem] text-zinc-500">
                                     +{project.tags.length - 4}
                                 </span>
                             )}

@@ -27,7 +27,10 @@ export const projectsData: Project[] = [
                 playbackRange: { start: 2, end: 16 },
             },
         ],
-        links: {},
+        links: {
+            liveDemo: "https://www.roblox.com/games/84111693431354/Steal-A-Garden",
+        },
+        statusLabel: "Live Game • Proprietary Codebase",
     },
     {
         id: "project-far",
@@ -64,6 +67,7 @@ export const projectsData: Project[] = [
             },
         ],
         links: {},
+        statusLabel: "In Active Development • Unreleased",
     },
 ]
 

@@ -46,10 +46,7 @@ export function Projects() {
     }, [])
 
     return (
-        <main
-            ref={pageRef}
-            className="relative isolate min-h-screen overflow-x-hidden bg-background font-jetbrains text-white"
-        >
+        <main ref={pageRef} className="relative isolate min-h-screen overflow-x-hidden bg-background text-white">
             <Dither disableAnimation className="!absolute !inset-x-0 !top-0 !bottom-auto h-[46rem] opacity-65" />
 
             {/* Fade the project intro into the quieter directory surface */}

@@ -59,7 +59,7 @@ export function FeaturedProjectsSection() {
             ref={sectionRef}
             id="projects"
             aria-labelledby="featured-projects-title"
-            className="relative z-20 min-h-screen w-full bg-background px-5 py-24 font-jetbrains sm:px-8 sm:py-32 lg:px-12"
+            className="relative z-20 min-h-screen w-full bg-background px-5 py-24 sm:px-8 sm:py-32 lg:px-12"
         >
             {/* Full-width top gradient fade transitioning from Dither Hero into dark background */}
             <div

@@ -51,7 +51,7 @@ describe("Smoke Tests - Core Components", () => {
             </MemoryRouter>,
         )
 
-        expect(screen.getByRole("heading", { name: /let's build something togheter/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /let's build something together/i })).toBeInTheDocument()
         expect(screen.getByRole("link", { name: /linkedin/i })).toHaveAttribute(
             "href",
             "https://www.linkedin.com/in/daniel-senzaki-132905407/",
@@ -62,6 +62,10 @@ describe("Smoke Tests - Core Components", () => {
         expect(screen.getByRole("link", { name: /discord/i })).toHaveAttribute(
             "href",
             "https://discord.com/users/670030102490382346",
+        )
+        expect(screen.getByRole("link", { name: /email/i })).toHaveAttribute(
+            "href",
+            "mailto:daniyusk.dev@gmail.com",
         )
     })
 })

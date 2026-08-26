@@ -1,4 +1,4 @@
-import { ExternalLink, FileText, X } from "lucide-react"
+import { ExternalLink, FileText, Lock, X } from "lucide-react"
 import { Github } from "pixelarticons/react/Github"
 import { useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
@@ -77,7 +77,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             aria-labelledby="project-modal-title"
             aria-describedby="project-modal-description"
             data-testid="project-modal"
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 font-jetbrains sm:p-5 md:p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6"
         >
             {/* Backdrop */}
             <button
@@ -126,7 +126,10 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
 
                             <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5">
                                 {project.tags.slice(0, 4).map((tag) => (
-                                    <span key={tag} className="text-[0.66rem] font-medium text-violet-300">
+                                    <span
+                                        key={tag}
+                                        className="font-jetbrains text-[0.66rem] font-medium text-violet-300"
+                                    >
                                         {tag}
                                     </span>
                                 ))}
@@ -140,8 +143,11 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                             {project.shortDescription}
                         </p>
 
-                        {/* Grouped Action Links */}
-                        {(project.links.liveDemo || project.links.github || project.links.caseStudy) && (
+                        {/* Grouped Action Links & Status */}
+                        {(project.links.liveDemo ||
+                            project.links.github ||
+                            project.links.caseStudy ||
+                            project.statusLabel) && (
                             <div className="mt-auto flex shrink-0 flex-wrap items-center gap-2 pt-5">
                                 {project.links.liveDemo && (
                                     <a
@@ -152,7 +158,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                         className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-600/90 px-4 py-2 text-xs font-semibold text-white outline-none motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-500 active:scale-95"
                                     >
                                         <ExternalLink className="h-3.5 w-3.5" />
-                                        <span>Live demo</span>
+                                        <span>Play Game</span>
                                     </a>
                                 )}
 
@@ -167,6 +173,13 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                         <Github className="h-3.5 w-3.5" />
                                         <span>Source</span>
                                     </a>
+                                )}
+
+                                {project.statusLabel && !project.links.github && (
+                                    <span className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 font-jetbrains text-[0.72rem] font-medium text-zinc-400">
+                                        <Lock className="h-3.5 w-3.5 text-violet-400/80" />
+                                        <span>{project.statusLabel}</span>
+                                    </span>
                                 )}
 
                                 {project.links.caseStudy && (

@@ -2,6 +2,7 @@ import gsap from "gsap"
 import { Discord } from "pixelarticons/react/Discord"
 import { Github } from "pixelarticons/react/Github"
 import { Linkedin } from "pixelarticons/react/Linkedin"
+import { Mail } from "pixelarticons/react/Mail"
 import type { CSSProperties } from "react"
 import { useEffect, useMemo, useRef } from "react"
 
@@ -37,6 +38,14 @@ const CONTACTS: SocialContact[] = [
         icon: Discord,
         hoverClass:
             "hover:bg-[#5865f2]/15 hover:text-[#7289da] hover:shadow-[0_0_24px_rgba(88,101,242,0.35)] focus-visible:bg-[#5865f2]/15 focus-visible:text-[#7289da]",
+    },
+    {
+        name: "Email",
+        handle: "daniyusk.dev@gmail.com",
+        url: "mailto:daniyusk.dev@gmail.com",
+        icon: Mail,
+        hoverClass:
+            "hover:bg-emerald-500/15 hover:text-emerald-300 hover:shadow-[0_0_24px_rgba(16,185,129,0.35)] focus-visible:bg-emerald-500/15 focus-visible:text-emerald-300",
     },
 ]
 
@@ -136,7 +145,7 @@ export function ContactSection() {
             ref={sectionRef}
             id="contact"
             aria-labelledby="contact-heading"
-            className="relative z-20 flex min-h-screen h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 sm:px-6 font-jetbrains"
+            className="relative z-20 flex min-h-screen h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 sm:px-6"
         >
             {/* Full-width top gradient fade covering 100% of the screen width */}
             <div
@@ -163,7 +172,7 @@ export function ContactSection() {
                     data-contact-element
                     className="text-lg font-bold tracking-wider text-white uppercase sm:text-2xl lg:text-3xl"
                 >
-                    Let&apos;s build something togheter
+                    Let&apos;s build something together
                 </h2>
 
                 {/* Circular Icon Buttons Row */}
@@ -188,7 +197,7 @@ export function ContactSection() {
                                 >
                                     <div className="rounded-xl bg-zinc-900/95 px-3.5 py-2 shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-md text-center">
                                         <p className="text-xs font-semibold text-white tracking-normal">{item.name}</p>
-                                        <p className="text-[0.72rem] font-medium text-zinc-400 leading-tight">
+                                        <p className="text-[0.72rem] font-medium font-jetbrains text-zinc-400 leading-tight">
                                             {item.handle}
                                         </p>
                                     </div>

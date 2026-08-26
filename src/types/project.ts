@@ -48,4 +48,5 @@ export interface Project {
     media: ProjectMedia[]
     links: ProjectLinks
     featuredOrder?: number
+    statusLabel?: string
 }

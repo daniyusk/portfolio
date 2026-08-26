@@ -37,11 +37,3 @@ export function getPreviewStart(media: ProjectVideoMedia): number {
 
     return requestedStart
 }
-
-export function seekVideo(video: HTMLVideoElement, time: number): void {
-    try {
-        video.currentTime = time
-    } catch {
-        // Streams may reject seeks before their metadata is available.
-    }
-}

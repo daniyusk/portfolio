@@ -78,18 +78,43 @@ body {
     }
 }
 
-@keyframes media-feedback {
+@keyframes media-control-feedback {
     0% {
-        opacity: 0;
+        opacity: 0.35;
         transform: scale(0.72);
     }
-    18% {
+    65% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+    100% {
         opacity: 1;
         transform: scale(1);
     }
-    100% {
-        opacity: 0;
-        transform: scale(1.12);
+}
+
+.cosmic-player-gesture {
+    display: block;
+}
+
+.cosmic-play-button:not([data-paused]) .cosmic-play-icon,
+.cosmic-play-button[data-paused] .cosmic-pause-icon,
+.cosmic-mute-button:not([data-muted]) .cosmic-mute-icon,
+.cosmic-mute-button[data-muted] .cosmic-volume-icon,
+.cosmic-fullscreen-button[data-active] .cosmic-fs-enter-icon,
+.cosmic-fullscreen-button:not([data-active]) .cosmic-fs-exit-icon {
+    display: none;
+}
+
+@media (pointer: coarse) {
+    .cosmic-player-gesture[action="toggle:paused"] {
+        display: none;
+    }
+}
+
+@media not (pointer: coarse) {
+    .cosmic-player-gesture[action="toggle:controls"] {
+        display: none;
     }
 }
 

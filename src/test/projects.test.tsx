@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
 import { MediaViewer } from "@/components/MediaViewer"
@@ -32,7 +32,7 @@ const mockSingleProject: Project = {
         },
         {
             type: "video",
-            url: "https://example.com/demo.webm",
+            url: "https://example.com/demo.mp4",
             alt: "Test Project Demo Video",
         },
     ],
@@ -81,14 +81,14 @@ describe("Projects Data Model & Helpers", () => {
         expect(nonExistent).toBeUndefined()
     })
 
-    it("registers the Roblox projects with local video previews and posters", () => {
+    it("registers broadly compatible local MP4 previews without video thumbnails", () => {
         const stealAGarden = getProjectById("steal-a-garden")
         const projectFar = getProjectById("project-far")
 
         expect(stealAGarden?.media).toHaveLength(1)
         expect(stealAGarden?.cover?.url).toBe("/media/projects/steal-a-garden-cover.webp")
-        expect(stealAGarden?.media[0]?.url).toBe("/media/projects/steal-a-garden-combat.webm")
-        expect(stealAGarden?.media[0]?.thumbnailUrl).toBe("/media/projects/steal-a-garden-combat.webp")
+        expect(stealAGarden?.media[0]?.url).toBe("/media/projects/steal-a-garden-combat.mp4")
+        expect(stealAGarden?.media[0]).not.toHaveProperty("thumbnailUrl")
         expect(stealAGarden?.media[0]).toMatchObject({
             fitMode: "contain",
             previewTimestamp: 2.5,
@@ -97,7 +97,8 @@ describe("Projects Data Model & Helpers", () => {
 
         expect(projectFar?.media).toHaveLength(2)
         expect(projectFar?.cover?.url).toBe("/media/projects/project-far-cover.webp")
-        expect(projectFar?.media.every((media) => media.type === "video" && Boolean(media.thumbnailUrl))).toBe(true)
+        expect(projectFar?.media.every((media) => media.type === "video" && media.url.endsWith(".mp4"))).toBe(true)
+        expect(projectFar?.media.every((media) => !("thumbnailUrl" in media))).toBe(true)
         expect(projectFar?.media.some((media) => media.url === projectFar.cover?.url)).toBe(false)
     })
 
@@ -130,137 +131,103 @@ describe("MediaViewer Component", () => {
         expect(screen.queryByText("IMG")).not.toBeInTheDocument()
     })
 
-    it("renders custom play/pause and audio controls without native video controls", () => {
-        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
-        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
+    it("renders Vidstack media primitives and cosmic controls without native controls", () => {
         const { container } = render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/video.webm",
+                        url: "https://example.com/video.mp4",
                         alt: "Preview video",
                         fitMode: "contain",
-                        thumbnailUrl: "https://example.com/video.webp",
                     },
                 ]}
             />,
         )
 
-        const video = container.querySelector("video")
+        const video = container.querySelector("[data-media-provider] video")
+        const player = container.querySelector("[data-media-player]")
         expect(video).toBeInTheDocument()
-        expect(video).toHaveAttribute("src", "https://example.com/video.webm")
+        expect(player).toHaveAttribute("data-media-player")
+        expect(player).toHaveAttribute("data-muted")
         expect(video).not.toHaveAttribute("controls")
-        expect(video?.muted).toBe(true)
-        expect(video).toHaveClass("object-contain")
-        expect(container.querySelector('img[aria-hidden="true"]')).toHaveAttribute(
-            "src",
-            "https://example.com/video.webp",
-        )
-
-        fireEvent.click(screen.getByRole("button", { name: /play video/i }))
-        expect(play).toHaveBeenCalledTimes(1)
-
-        fireEvent.play(video as HTMLVideoElement)
-        fireEvent.click(screen.getByRole("button", { name: /pause video/i }))
-        expect(pause).toHaveBeenCalledTimes(1)
-
-        fireEvent.click(screen.getByRole("button", { name: /unmute video/i }))
-        expect(video?.muted).toBe(false)
-
-        play.mockRestore()
-        pause.mockRestore()
+        expect(container.querySelector("[data-media-provider]")).toHaveClass("[&>video]:object-contain")
+        expect(container.querySelector('video[src="https://example.com/video.mp4"].scale-125')).toBeInTheDocument()
+        expect(container.querySelector("img")).not.toBeInTheDocument()
+        expect(player).not.toHaveAttribute("data-poster")
+        expect(screen.getAllByRole("button", { name: /play/i })).toHaveLength(2)
+        expect(screen.getByRole("button", { name: /mute/i })).toBeInTheDocument()
+        expect(container.querySelector(".cosmic-volume-slider")).toBeInTheDocument()
     })
 
-    it("keeps modal playback inside the configured range", () => {
+    it("delegates the configured playback range and looping to Vidstack", () => {
         const { container } = render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/ranged.webm",
+                        url: "https://example.com/ranged.mp4",
                         alt: "Ranged preview",
                         playbackRange: { start: 3, end: 8 },
                     },
                 ]}
             />,
         )
-        const video = container.querySelector("video") as HTMLVideoElement
+        const player = container.querySelector("[data-media-player]")
 
-        fireEvent.loadedMetadata(video)
-        expect(video.currentTime).toBe(3)
-
-        video.currentTime = 8
-        fireEvent.timeUpdate(video)
-        expect(video.currentTime).toBe(3)
+        expect(player).toHaveAttribute("data-clip-start", "3")
+        expect(player).toHaveAttribute("data-clip-end", "8")
+        expect(player).toHaveAttribute("data-loop")
     })
 
-    it("seeks within the playback range and shows the proportional hover timestamp", () => {
+    it("renders the native Vidstack timeline with a time-only hover preview", () => {
         const { container } = render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/timeline.webm",
-                        thumbnailUrl: "https://example.com/timeline.webp",
+                        url: "https://example.com/timeline.mp4",
                         alt: "Timeline preview",
                         playbackRange: { start: 2, end: 12 },
                     },
                 ]}
             />,
         )
-        const video = container.querySelector("video") as HTMLVideoElement
         const slider = screen.getByRole("slider", { name: /video progress/i })
-        const timeline = screen.getByTestId("video-timeline")
 
-        expect(slider).toHaveAttribute("min", "2")
-        expect(slider).toHaveAttribute("max", "12")
-
-        fireEvent.change(slider, { target: { value: "7" } })
-        expect(video.currentTime).toBe(7)
-
-        Object.defineProperty(timeline, "getBoundingClientRect", {
-            configurable: true,
-            value: () => ({ left: 0, width: 100 }),
-        })
-        fireEvent.pointerDown(timeline, { clientX: 25, pointerId: 1, pointerType: "mouse" })
-        expect(video.currentTime).toBe(4.5)
-
-        fireEvent.pointerMove(timeline, { clientX: 75, pointerType: "mouse" })
-
-        expect(screen.getByText("0:09")).toBeInTheDocument()
-        expect(container.querySelector('img[src="https://example.com/timeline.webp"]')).toBeInTheDocument()
+        expect(slider).toHaveAttribute("data-media-time-slider")
+        expect(slider).toHaveAttribute("aria-valuemin", "0")
+        expect(slider).toHaveAttribute("aria-valuemax", "100")
+        expect(container.querySelector(".cosmic-slider-preview")).toBeInTheDocument()
+        expect(container.querySelector(".cosmic-slider-value")).toBeInTheDocument()
+        expect(container.querySelector(".cosmic-slider-preview img")).not.toBeInTheDocument()
     })
 
-    it("toggles playback with the Space key", () => {
-        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
+    it("exposes Vidstack keyboard shortcuts on playback controls", () => {
         render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/keyboard.webm",
+                        url: "https://example.com/keyboard.mp4",
                         alt: "Keyboard preview",
                     },
                 ]}
             />,
         )
 
-        fireEvent.keyDown(screen.getByRole("button", { name: /play video/i }), { key: " ", code: "Space" })
-        expect(play).toHaveBeenCalledTimes(1)
-
-        play.mockRestore()
+        for (const playButton of screen.getAllByRole("button", { name: /play/i })) {
+            expect(playButton).toHaveAttribute("aria-keyshortcuts", "k Space")
+        }
     })
 
-    it("reveals hidden mobile controls on the first touch and pauses on the second", () => {
-        vi.useFakeTimers()
-        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
-        render(
+    it("uses separate Vidstack gestures for desktop playback and mobile control reveal", () => {
+        const { container } = render(
             <MediaViewer
                 media={[
                     {
                         type: "video",
-                        url: "https://example.com/touch.webm",
+                        url: "https://example.com/touch.mp4",
                         alt: "Touch preview",
                         playbackRange: { start: 1, end: 6 },
                     },
@@ -268,25 +235,9 @@ describe("MediaViewer Component", () => {
             />,
         )
 
-        const video = screen.getByLabelText(/touch preview/i)
-        fireEvent.play(video)
-        act(() => vi.advanceTimersByTime(3000))
-
-        const surface = screen.getByRole("button", { name: /pause video/i })
-        const slider = screen.getByRole("slider", { name: /video progress/i })
-        expect(slider).toHaveAttribute("tabindex", "-1")
-
-        fireEvent.pointerDown(surface, { pointerType: "touch" })
-        fireEvent.click(surface, { detail: 1 })
-        expect(pause).not.toHaveBeenCalled()
-        expect(slider).toHaveAttribute("tabindex", "0")
-
-        fireEvent.pointerDown(surface, { pointerType: "touch" })
-        fireEvent.click(surface, { detail: 1 })
-        expect(pause).toHaveBeenCalledTimes(1)
-
-        pause.mockRestore()
-        vi.useRealTimers()
+        expect(container.querySelector('[data-media-gesture][action="toggle:paused"]')).toBeInTheDocument()
+        expect(container.querySelector('[data-media-gesture][action="toggle:controls"]')).toBeInTheDocument()
+        expect(container.querySelector(".cosmic-controls")).toBeInTheDocument()
     })
 
     it("displays error fallback on asset load error", () => {
@@ -326,7 +277,7 @@ describe("MediaViewer Component", () => {
         fireEvent.click(nextButton)
 
         // Moves to second media (video)
-        expect(screen.getByLabelText(/test project demo video/i)).toBeInTheDocument()
+        expect(screen.getByRole("region", { name: /test project demo video/i })).toBeInTheDocument()
     })
 })
 
@@ -365,8 +316,6 @@ describe("ProjectCard Component", () => {
     })
 
     it("plays video previews only while hovered and resets them afterward", () => {
-        const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue()
-        const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined)
         const videoProject: Project = {
             ...mockSingleProject,
             cover: {
@@ -376,8 +325,7 @@ describe("ProjectCard Component", () => {
             media: [
                 {
                     type: "video",
-                    url: "https://example.com/demo.webm",
-                    thumbnailUrl: "https://example.com/poster.jpg",
+                    url: "https://example.com/demo.mp4",
                     alt: "Static video preview",
                     fitMode: "contain",
                     previewTimestamp: 3,
@@ -387,35 +335,30 @@ describe("ProjectCard Component", () => {
         }
 
         const { container } = render(<ProjectCard project={videoProject} />)
-        const video = container.querySelector("video")
+        const player = container.querySelector("[data-media-player]")
         const card = screen.getByRole("button", { name: /view details for test system alpha/i })
 
-        expect(video).not.toHaveAttribute("autoplay")
-        expect(video).toHaveAttribute("loop")
-        expect(video?.muted).toBe(true)
-        expect(video).toHaveClass("object-cover")
-        expect(video).toHaveAttribute("poster", "https://example.com/cover.jpg")
+        expect(player).not.toHaveAttribute("data-autoplay")
+        expect(player).toHaveAttribute("data-loop")
+        expect(player).toHaveAttribute("data-muted")
+        expect(player).toHaveAttribute("data-load", "eager")
+        expect(player).toHaveAttribute("data-preview-start", "3")
+        expect(player).toHaveAttribute("data-clip-end", "7")
+        expect(player).not.toHaveAttribute("data-poster")
+        expect(container.querySelector("[data-media-provider]")).toHaveClass("[&>video]:object-cover")
+        expect(container.querySelector("video")).toHaveClass("object-cover")
+        expect(container.querySelector("video")).toHaveStyle({ objectFit: "cover" })
+        expect(player).toHaveClass("opacity-0")
         const cover = screen.getByRole("img", { name: /dedicated project cover/i })
         expect(cover).toHaveClass("object-cover")
         expect(cover).toHaveAttribute("src", "https://example.com/cover.jpg")
         expect(container.querySelectorAll("img")).toHaveLength(1)
 
         fireEvent.mouseEnter(card)
-        expect(play).toHaveBeenCalledTimes(1)
-        expect(video?.currentTime).toBe(3)
-
-        if (video) {
-            video.currentTime = 7
-            fireEvent.timeUpdate(video)
-            expect(video.currentTime).toBe(2)
-        }
+        expect(player).toHaveClass("opacity-100")
 
         fireEvent.mouseLeave(card)
-        expect(pause).toHaveBeenCalledTimes(1)
-        expect(video?.currentTime).toBe(3)
-
-        play.mockRestore()
-        pause.mockRestore()
+        expect(player).toHaveClass("opacity-0")
     })
 
     it("keeps GIF thumbnails static until hover", () => {
@@ -442,6 +385,33 @@ describe("ProjectCard Component", () => {
 
         fireEvent.mouseLeave(card)
         expect(container.querySelectorAll("img")).toHaveLength(1)
+    })
+
+    it("keeps the static cover visible when a video preview fails", async () => {
+        const videoProject: Project = {
+            ...mockSingleProject,
+            cover: {
+                url: "https://example.com/cover.jpg",
+                alt: "Fallback project cover",
+            },
+            media: [
+                {
+                    type: "video",
+                    url: "https://example.com/broken.mp4",
+                    alt: "Broken video preview",
+                },
+            ],
+        }
+
+        const { container } = render(<ProjectCard project={videoProject} />)
+        const player = container.querySelector("[data-media-player]")
+        const video = container.querySelector("video")
+
+        fireEvent.error(video as HTMLVideoElement)
+        fireEvent.mouseEnter(screen.getByRole("button", { name: /view details for test system alpha/i }))
+
+        await waitFor(() => expect(player).toHaveClass("opacity-0"))
+        expect(screen.getByRole("img", { name: /fallback project cover/i })).toBeVisible()
     })
 })
 
@@ -489,10 +459,13 @@ describe("ProjectModal Component", () => {
         expect(projectFar).toBeDefined()
 
         render(<ProjectModal project={projectFar ?? null} isOpen={true} onClose={vi.fn()} />)
-        const video = screen.getByLabelText(/project far reactive main menu/i)
+        const player = screen.getByRole("region", { name: /project far reactive main menu/i })
 
-        expect(video).toHaveAttribute("src", "/media/projects/project-far-menu.webm")
-        expect(video).toHaveAttribute("poster", "/media/projects/project-far-menu.webp")
+        expect(player).toHaveAttribute("data-source", "/media/projects/project-far-menu.mp4")
+        expect(player).not.toHaveAttribute("data-poster")
+        expect(document.querySelectorAll("video")).toHaveLength(2)
+        expect(document.querySelector("video.scale-125")).toHaveClass("blur-2xl", "opacity-40", "brightness-75")
+        expect(document.querySelector(".cosmic-slider-preview img")).not.toBeInTheDocument()
         expect(screen.queryByRole("img", { name: /project far logo cover/i })).not.toBeInTheDocument()
     })
 })

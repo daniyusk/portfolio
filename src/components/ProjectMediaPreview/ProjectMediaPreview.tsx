@@ -1,7 +1,8 @@
+import { MediaPlayer, type MediaPlayerInstance, MediaProvider } from "@vidstack/react"
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/styles/utils"
 import type { ProjectCover, ProjectMedia } from "@/types/project"
-import { getPlaybackRange, getPreviewStart, seekVideo } from "@/utils/projectMedia"
+import { getPlaybackRange, getPreviewStart } from "@/utils/projectMedia"
 
 export interface ProjectMediaPreviewProps {
     media: ProjectMedia
@@ -17,9 +18,9 @@ const prefersReducedMotion = () =>
 
 export function ProjectMediaPreview({ media, cover, title, className }: ProjectMediaPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null)
-    const videoRef = useRef<HTMLVideoElement>(null)
-    const isPreviewActiveRef = useRef(false)
+    const playerRef = useRef<MediaPlayerInstance>(null)
     const [isPlaying, setIsPlaying] = useState(false)
+    const [hasVideoError, setHasVideoError] = useState(false)
     const videoMedia = media.type === "video" ? media : undefined
     const previewStart = videoMedia ? getPreviewStart(videoMedia) : 0
     const playbackRange = videoMedia ? getPlaybackRange(videoMedia) : undefined
@@ -30,30 +31,28 @@ export function ProjectMediaPreview({ media, cover, title, className }: ProjectM
         const trigger = container.closest<HTMLElement>("[data-project-preview-trigger]") ?? container
 
         const startPreview = () => {
-            if (prefersReducedMotion() || media.type === "image") return
+            if (prefersReducedMotion() || media.type === "image" || hasVideoError) return
 
             setIsPlaying(true)
 
             if (media.type === "video") {
-                const video = videoRef.current
-                if (!video) return
+                const player = playerRef.current
+                if (!player) return
 
-                isPreviewActiveRef.current = true
-                video.muted = true
-                seekVideo(video, previewStart)
-                void video.play().catch(() => setIsPlaying(false))
+                player.muted = true
+                player.currentTime = 0
+                void player.play().catch(() => setIsPlaying(false))
             }
         }
 
         const resetPreview = () => {
             setIsPlaying(false)
 
-            const video = videoRef.current
-            if (!video) return
+            const player = playerRef.current
+            if (!player) return
 
-            isPreviewActiveRef.current = false
-            video.pause()
-            seekVideo(video, previewStart)
+            player.pause()
+            player.currentTime = 0
         }
 
         trigger.addEventListener("mouseenter", startPreview)
@@ -64,9 +63,9 @@ export function ProjectMediaPreview({ media, cover, title, className }: ProjectM
             trigger.removeEventListener("mouseleave", resetPreview)
             resetPreview()
         }
-    }, [media, previewStart])
+    }, [hasVideoError, media])
 
-    const mediaFallback = media.type === "video" ? media.thumbnailUrl : media.thumbnailUrl || media.url
+    const mediaFallback = media.type === "video" ? undefined : media.thumbnailUrl || media.url
     const staticSource = cover?.url || mediaFallback
     const staticAlt = cover?.alt || media.alt || `${title} preview`
 
@@ -83,33 +82,43 @@ export function ProjectMediaPreview({ media, cover, title, className }: ProjectM
             )}
 
             {media.type === "video" && (
-                <video
-                    ref={videoRef}
+                <MediaPlayer
+                    ref={playerRef}
                     src={media.url}
-                    poster={cover?.url || media.thumbnailUrl}
+                    title={`${title} preview`}
+                    ariaLabel={staticSource ? undefined : media.alt || `${title} preview video`}
                     muted
                     loop
                     playsInline
                     preload="metadata"
-                    aria-label={staticSource ? undefined : media.alt || `${title} preview video`}
-                    aria-hidden={staticSource ? "true" : undefined}
-                    tabIndex={-1}
-                    onLoadedMetadata={(event) => seekVideo(event.currentTarget, previewStart)}
-                    onTimeUpdate={(event) => {
-                        if (
-                            isPreviewActiveRef.current &&
-                            playbackRange &&
-                            event.currentTarget.currentTime >= playbackRange.end
-                        ) {
-                            seekVideo(event.currentTarget, playbackRange.start)
-                        }
+                    load="eager"
+                    clipStartTime={previewStart}
+                    clipEndTime={playbackRange?.end ?? 0}
+                    data-source={media.url}
+                    data-preview-start={previewStart}
+                    data-clip-end={playbackRange?.end}
+                    onError={() => {
+                        setIsPlaying(false)
+                        setHasVideoError(true)
                     }}
                     className={cn(
-                        "pointer-events-none absolute inset-0 h-full w-full select-none object-cover",
+                        "pointer-events-none absolute inset-0 h-full w-full select-none bg-zinc-950 outline-none",
                         "motion-safe:transition-opacity motion-safe:duration-200",
-                        isPlaying || !staticSource ? "opacity-100" : "opacity-0",
+                        (isPlaying || !staticSource) && !hasVideoError ? "opacity-100" : "opacity-0",
                     )}
-                />
+                    tabIndex={-1}
+                >
+                    <MediaProvider
+                        className="h-full w-full [&>video]:h-full [&>video]:w-full [&>video]:object-cover"
+                        mediaProps={{
+                            "aria-hidden": staticSource ? "true" : undefined,
+                            "aria-label": staticSource ? undefined : media.alt || `${title} preview video`,
+                            className: "h-full w-full object-cover",
+                            style: { height: "100%", width: "100%", objectFit: "cover" },
+                            tabIndex: -1,
+                        }}
+                    />
+                </MediaPlayer>
             )}
 
             {media.type === "gif" && isPlaying && (

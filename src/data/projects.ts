@@ -19,8 +19,7 @@ export const projectsData: Project[] = [
         media: [
             {
                 type: "video",
-                url: "/media/projects/steal-a-garden-combat.webm",
-                thumbnailUrl: "/media/projects/steal-a-garden-combat.webp",
+                url: "/media/projects/steal-a-garden-combat.mp4",
                 alt: "Steal a Garden combat system gameplay",
                 caption: "Refactored combat flow, hit feedback, and character interactions",
                 fitMode: "contain",
@@ -48,8 +47,7 @@ export const projectsData: Project[] = [
         media: [
             {
                 type: "video",
-                url: "/media/projects/project-far-menu.webm",
-                thumbnailUrl: "/media/projects/project-far-menu.webp",
+                url: "/media/projects/project-far-menu.mp4",
                 alt: "Project FAR reactive main menu",
                 caption: "Reactive space-themed menu and navigation states",
                 fitMode: "contain",
@@ -58,8 +56,7 @@ export const projectsData: Project[] = [
             },
             {
                 type: "video",
-                url: "/media/projects/project-far-crafting.webm",
-                thumbnailUrl: "/media/projects/project-far-crafting.webp",
+                url: "/media/projects/project-far-crafting.mp4",
                 alt: "Project FAR crafting interface",
                 caption: "Crafting recipes, requirements, and localized UI states",
                 fitMode: "contain",

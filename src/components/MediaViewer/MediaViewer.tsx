@@ -46,7 +46,7 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
     }
 
     return (
-        <div className="relative h-full w-full">
+        <div className="relative isolate h-full w-full">
             {isLoading && (
                 <div className="absolute inset-0 z-50 flex animate-pulse items-center justify-center bg-zinc-900/90 backdrop-blur-sm">
                     <div className="flex items-center gap-2 font-jetbrains text-xs text-zinc-400">
@@ -70,12 +70,13 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
             ) : (
                 <>
                     {media.fitMode === "contain" && (
-                        <img
-                            src={media.thumbnailUrl || media.url}
-                            alt=""
-                            aria-hidden="true"
-                            className="pointer-events-none absolute -inset-8 h-[calc(100%+4rem)] w-[calc(100%+4rem)] scale-110 object-cover opacity-25 blur-2xl saturate-150"
-                        />
+                        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+                            <img
+                                src={media.thumbnailUrl || media.url}
+                                alt=""
+                                className="h-full w-full scale-125 object-cover blur-2xl opacity-40 brightness-75"
+                            />
+                        </div>
                     )}
                     <img
                         src={media.url}

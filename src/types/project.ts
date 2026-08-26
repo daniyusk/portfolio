@@ -17,7 +17,6 @@ export type ProjectMedia = ProjectMediaBase &
         | { type: "image"; thumbnailUrl?: string }
         | {
               type: "video"
-              thumbnailUrl?: string
               previewTimestamp?: number
               playbackRange?: PlaybackRange
           }

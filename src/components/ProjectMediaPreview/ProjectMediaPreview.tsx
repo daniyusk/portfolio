@@ -87,7 +87,7 @@ export function ProjectMediaPreview({ media, cover, title, className }: ProjectM
                     src={media.url}
                     title={`${title} preview`}
                     ariaLabel={staticSource ? undefined : media.alt || `${title} preview video`}
-                    muted
+                    muted={true}
                     loop
                     playsInline
                     preload="metadata"

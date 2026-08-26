@@ -54,7 +54,7 @@ export function ProjectCarousel({ category, projects, onSelectProject }: Project
                         onClick={() => move(-1)}
                         aria-label={`Previous projects in ${category}`}
                         aria-controls={trackId}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06] text-zinc-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] outline-none transition hover:bg-white/[0.11] hover:text-white focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.06] text-zinc-300 outline-none transition hover:border-white/10 hover:bg-white/[0.11] hover:text-white focus-visible:border-white/15"
                     >
                         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -63,7 +63,7 @@ export function ProjectCarousel({ category, projects, onSelectProject }: Project
                         onClick={() => move(1)}
                         aria-label={`Next projects in ${category}`}
                         aria-controls={trackId}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06] text-zinc-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] outline-none transition hover:bg-white/[0.11] hover:text-white focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.06] text-zinc-300 outline-none transition hover:border-white/10 hover:bg-white/[0.11] hover:text-white focus-visible:border-white/15"
                     >
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </button>

@@ -270,11 +270,6 @@ export function AccordionGallery({
                         className={cn(
                             "group relative block min-h-0 min-w-0 flex-[1_1_0] cursor-pointer overflow-hidden bg-zinc-950 p-0 text-left no-underline outline-none",
                             "[transform-style:preserve-3d] [transform-origin:center]",
-                            "shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] transition-shadow duration-300",
-                            isActive
-                                ? "shadow-[0_20px_50px_rgba(76,29,149,0.2)]"
-                                : "hover:shadow-[0_18px_46px_rgba(0,0,0,0.72)]",
-                            "focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-4 focus-visible:ring-offset-background",
                             "max-[640px]:min-h-[96px] max-[640px]:!transform-none",
                         )}
                         style={
@@ -339,7 +334,7 @@ export function AccordionGallery({
                                 <div className="min-w-0 flex-1 space-y-2.5">
                                     {/* Title */}
                                     <h3
-                                        className="truncate font-extrabold text-xl tracking-tight drop-shadow-md sm:text-2xl lg:text-3xl"
+                                        className="truncate font-extrabold text-xl tracking-tight sm:text-2xl lg:text-3xl"
                                         style={{ color: textColor }}
                                     >
                                         {project.title}
@@ -350,7 +345,7 @@ export function AccordionGallery({
                                         {project.tags.slice(0, 4).map((tag) => (
                                             <span
                                                 key={tag}
-                                                className="inline-flex items-center rounded-full bg-violet-950/85 px-3 py-1 font-medium text-[0.7rem] text-violet-200 shadow-sm backdrop-blur-md"
+                                                className="inline-flex items-center rounded-full bg-violet-950/85 px-3 py-1 font-medium text-[0.7rem] text-violet-200 backdrop-blur-md"
                                             >
                                                 {tag}
                                             </span>
@@ -362,7 +357,7 @@ export function AccordionGallery({
                                 <div className="shrink-0">
                                     <span
                                         aria-hidden="true"
-                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-600/90 text-white shadow-[0_4px_20px_rgba(124,58,237,0.45)] backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-violet-500 group-hover:shadow-[0_4px_25px_rgba(124,58,237,0.7)]"
+                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-600/90 text-white backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:bg-violet-500"
                                     >
                                         <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                                     </span>

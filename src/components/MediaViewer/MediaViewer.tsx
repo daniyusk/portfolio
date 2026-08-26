@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Film, ImageIcon, RefreshCw } from "lucide-react"
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { VideoPlayer } from "@/components/MediaViewer/VideoPlayer"
 import { cn } from "@/styles/utils"
 import type { ProjectMedia } from "@/types/project"
@@ -16,9 +16,50 @@ interface SingleMediaViewProps {
     title?: string
 }
 
+const LOADING_INDICATOR_DELAY = 180
+const readyMediaUrls = new Set<string>()
+
 function SingleMediaView({ media, title }: SingleMediaViewProps) {
-    const [isLoading, setIsLoading] = useState(true)
+    const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const [showLoading, setShowLoading] = useState(false)
     const [hasError, setHasError] = useState(false)
+
+    const clearLoadingTimer = useCallback(() => {
+        if (!loadingTimerRef.current) return
+        clearTimeout(loadingTimerRef.current)
+        loadingTimerRef.current = null
+    }, [])
+
+    const scheduleLoading = useCallback(
+        (includeCachedMedia = false) => {
+            clearLoadingTimer()
+            if (!includeCachedMedia && readyMediaUrls.has(media.url)) return
+
+            loadingTimerRef.current = setTimeout(() => {
+                setShowLoading(true)
+                loadingTimerRef.current = null
+            }, LOADING_INDICATOR_DELAY)
+        },
+        [clearLoadingTimer, media.url],
+    )
+
+    const markReady = useCallback(() => {
+        readyMediaUrls.add(media.url)
+        clearLoadingTimer()
+        setShowLoading(false)
+    }, [clearLoadingTimer, media.url])
+
+    const markFailed = useCallback(() => {
+        readyMediaUrls.delete(media.url)
+        clearLoadingTimer()
+        setShowLoading(false)
+        setHasError(true)
+    }, [clearLoadingTimer, media.url])
+
+    useEffect(() => {
+        scheduleLoading()
+        return clearLoadingTimer
+    }, [clearLoadingTimer, scheduleLoading])
 
     if (hasError) {
         return (
@@ -34,7 +75,7 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
                     type="button"
                     onClick={() => {
                         setHasError(false)
-                        setIsLoading(true)
+                        scheduleLoading()
                     }}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[0.7rem] text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
                 >
@@ -47,12 +88,13 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
 
     return (
         <div className="relative isolate h-full w-full">
-            {isLoading && (
-                <div className="absolute inset-0 z-50 flex animate-pulse items-center justify-center bg-zinc-900/90 backdrop-blur-sm">
-                    <div className="flex items-center gap-2 font-jetbrains text-xs text-zinc-400">
-                        <RefreshCw className="h-4 w-4 animate-spin text-violet-400" />
-                        <span>Loading asset...</span>
-                    </div>
+            {showLoading && (
+                <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-black/10">
+                    <div
+                        role="status"
+                        aria-label="Loading media"
+                        className="h-7 w-7 animate-spin rounded-full border border-white/15 border-t-white/60 bg-black/10"
+                    />
                 </div>
             )}
 
@@ -60,12 +102,10 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
                 <VideoPlayer
                     media={media}
                     title={title}
-                    isLoading={isLoading}
-                    onLoadedData={() => setIsLoading(false)}
-                    onError={() => {
-                        setIsLoading(false)
-                        setHasError(true)
-                    }}
+                    onCanPlay={markReady}
+                    onPlaying={markReady}
+                    onWaiting={() => scheduleLoading(true)}
+                    onError={markFailed}
                 />
             ) : (
                 <>
@@ -82,15 +122,11 @@ function SingleMediaView({ media, title }: SingleMediaViewProps) {
                         src={media.url}
                         alt={media.alt || `${title || "Project"} preview image`}
                         loading="lazy"
-                        onLoad={() => setIsLoading(false)}
-                        onError={() => {
-                            setIsLoading(false)
-                            setHasError(true)
-                        }}
+                        onLoad={markReady}
+                        onError={markFailed}
                         className={cn(
                             "relative h-full w-full transition-all duration-500 group-hover/media:scale-105",
                             media.fitMode === "contain" ? "object-contain" : "object-cover",
-                            isLoading ? "opacity-0" : "opacity-100",
                         )}
                     />
                 </>
@@ -144,7 +180,7 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
     return (
         <div
             className={cn(
-                "group/media relative w-full overflow-hidden rounded-xl bg-zinc-950/80 border border-white/10 shadow-inner select-none",
+                "group/media relative w-full select-none overflow-hidden rounded-xl border border-white/5 bg-zinc-950/80",
                 aspectRatio,
                 className,
             )}
@@ -184,9 +220,7 @@ export function MediaViewer({ media, className, aspectRatio = "aspect-video", ti
                                 aria-label={`Go to slide ${idx + 1}`}
                                 className={cn(
                                     "h-1.5 rounded-full transition-all duration-200",
-                                    idx === currentIndex
-                                        ? "w-5 bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.8)]"
-                                        : "w-1.5 bg-white/40 hover:bg-white/70",
+                                    idx === currentIndex ? "w-5 bg-violet-400" : "w-1.5 bg-white/40 hover:bg-white/70",
                                 )}
                             />
                         ))}

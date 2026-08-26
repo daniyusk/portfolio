@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it, vi } from "vitest"
 import { MediaViewer } from "@/components/MediaViewer"
@@ -131,6 +131,39 @@ describe("MediaViewer Component", () => {
         expect(screen.queryByText("IMG")).not.toBeInTheDocument()
     })
 
+    it("debounces the minimal loading indicator and skips it for cached media", () => {
+        vi.useFakeTimers()
+        const media = [
+            {
+                type: "image" as const,
+                url: "https://example.com/debounce-cache-test.jpg",
+                alt: "Cached preview picture",
+            },
+        ]
+
+        const firstRender = render(<MediaViewer media={media} />)
+        const image = screen.getByRole("img", { name: /cached preview picture/i })
+
+        expect(screen.queryByRole("status", { name: /loading media/i })).not.toBeInTheDocument()
+        expect(screen.queryByText(/loading asset/i)).not.toBeInTheDocument()
+
+        act(() => vi.advanceTimersByTime(179))
+        expect(screen.queryByRole("status", { name: /loading media/i })).not.toBeInTheDocument()
+
+        act(() => vi.advanceTimersByTime(1))
+        expect(screen.getByRole("status", { name: /loading media/i })).toBeInTheDocument()
+
+        fireEvent.load(image)
+        expect(screen.queryByRole("status", { name: /loading media/i })).not.toBeInTheDocument()
+
+        firstRender.unmount()
+        render(<MediaViewer media={media} />)
+        act(() => vi.advanceTimersByTime(200))
+
+        expect(screen.queryByRole("status", { name: /loading media/i })).not.toBeInTheDocument()
+        vi.useRealTimers()
+    })
+
     it("renders Vidstack media primitives and cosmic controls without native controls", () => {
         const { container } = render(
             <MediaViewer
@@ -150,6 +183,7 @@ describe("MediaViewer Component", () => {
         expect(video).toBeInTheDocument()
         expect(player).toHaveAttribute("data-media-player")
         expect(player).toHaveAttribute("data-muted")
+        expect(player).toHaveAttribute("data-load", "eager")
         expect(video).not.toHaveAttribute("controls")
         expect(container.querySelector("[data-media-provider]")).toHaveClass("[&>video]:object-contain")
         expect(container.querySelector('video[src="https://example.com/video.mp4"].scale-125')).toBeInTheDocument()

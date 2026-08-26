@@ -39,9 +39,9 @@ export function ProjectCard({ project, onSelect, onNavigate, className }: Projec
             onKeyDown={handleKeyDown}
             aria-label={`View details for ${project.title}`}
             className={cn(
-                "group relative flex w-full cursor-pointer select-none flex-col overflow-hidden rounded-[20px] bg-zinc-950/70 text-left shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),0_18px_45px_rgba(0,0,0,0.2)] outline-none backdrop-blur-xl motion-safe:transition-all motion-safe:duration-300",
-                "motion-safe:hover:-translate-y-1 hover:bg-zinc-950/85 hover:shadow-[inset_0_0_0_1px_rgba(196,181,253,0.2),0_24px_58px_rgba(76,29,149,0.14)]",
-                "focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-4 focus-visible:ring-offset-background font-jetbrains",
+                "group relative flex w-full cursor-pointer select-none flex-col overflow-hidden rounded-[20px] bg-zinc-950/70 text-left outline-none backdrop-blur-xl motion-safe:transition-all motion-safe:duration-300",
+                "motion-safe:hover:-translate-y-1 hover:bg-zinc-950/85",
+                "font-jetbrains",
                 className,
             )}
         >

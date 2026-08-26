@@ -91,14 +91,14 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             {/* Modal Window */}
             <div
                 ref={modalRef}
-                className="relative z-10 h-[min(46rem,calc(100dvh-1.5rem))] w-full max-w-6xl overflow-hidden rounded-[22px] bg-[#0a0a0f]/94 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),0_30px_100px_rgba(0,0,0,0.88)] backdrop-blur-2xl sm:h-[min(46rem,calc(100dvh-2.5rem))] md:h-[min(42rem,calc(100dvh-3rem))]"
+                className="relative z-10 h-[min(46rem,calc(100dvh-1.5rem))] w-full max-w-6xl overflow-hidden rounded-[22px] bg-[#0a0a0f]/94 backdrop-blur-2xl sm:h-[min(46rem,calc(100dvh-2.5rem))] md:h-[min(42rem,calc(100dvh-3rem))]"
             >
                 <button
                     ref={closeBtnRef}
                     type="button"
                     onClick={onClose}
                     aria-label="Close project modal"
-                    className="group absolute top-4 right-4 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-black/65 text-zinc-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.4)] outline-none backdrop-blur-md motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-950/80 hover:text-white active:scale-95 focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                    className="group absolute top-4 right-4 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-black/65 text-zinc-300 outline-none backdrop-blur-md motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-950/80 hover:text-white active:scale-95"
                 >
                     <X className="h-5 w-5 motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:rotate-90" />
                 </button>
@@ -110,7 +110,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                             media={project.media}
                             title={project.title}
                             aspectRatio=""
-                            className="h-full !rounded-none !border-0 !shadow-none"
+                            className="h-full !rounded-none !border-0"
                         />
                     </div>
 
@@ -149,7 +149,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                         target="_blank"
                                         rel="noreferrer"
                                         aria-label={`Open live demo for ${project.title}`}
-                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-600/90 px-4 py-2 text-xs font-semibold text-white motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-500 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-600/90 px-4 py-2 text-xs font-semibold text-white outline-none motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-500 active:scale-95"
                                     >
                                         <ExternalLink className="h-3.5 w-3.5" />
                                         <span>Live demo</span>
@@ -162,7 +162,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                         target="_blank"
                                         rel="noreferrer"
                                         aria-label={`View GitHub repository for ${project.title}`}
-                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-white/[0.07] px-4 py-2 text-xs font-semibold text-zinc-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] motion-safe:transition-all motion-safe:duration-200 hover:bg-white/[0.11] hover:text-white active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-white/[0.07] px-4 py-2 text-xs font-semibold text-zinc-200 outline-none motion-safe:transition-all motion-safe:duration-200 hover:bg-white/[0.11] hover:text-white active:scale-95"
                                     >
                                         <Github className="h-3.5 w-3.5" />
                                         <span>Source</span>
@@ -175,7 +175,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                         target="_blank"
                                         rel="noreferrer"
                                         aria-label={`Read case study for ${project.title}`}
-                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-950/30 px-4 py-2 text-xs font-semibold text-violet-300 shadow-[inset_0_0_0_1px_rgba(167,139,250,0.18)] motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-950/50 hover:text-violet-100 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+                                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-950/30 px-4 py-2 text-xs font-semibold text-violet-300 outline-none motion-safe:transition-all motion-safe:duration-200 hover:bg-violet-950/50 hover:text-violet-100 active:scale-95"
                                     >
                                         <FileText className="h-3.5 w-3.5" />
                                         <span>Case study</span>

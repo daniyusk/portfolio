@@ -19,13 +19,14 @@ import { getPlaybackRange, type ProjectVideoMedia } from "@/utils/projectMedia"
 interface VideoPlayerProps {
     media: ProjectVideoMedia
     title?: string
-    isLoading: boolean
-    onLoadedData: () => void
+    onCanPlay: () => void
+    onPlaying: () => void
+    onWaiting: () => void
     onError: () => void
 }
 
 const controlButtonClass =
-    "pointer-events-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/45 text-zinc-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] outline-none backdrop-blur-md transition duration-200 hover:bg-white/15 hover:text-white active:scale-90 focus-visible:ring-2 focus-visible:ring-violet-300"
+    "pointer-events-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/45 text-zinc-100 outline-none backdrop-blur-md transition duration-200 hover:border-white/15 hover:bg-white/15 hover:text-white active:scale-90 focus-visible:border-white/25"
 
 function PlayerGestures() {
     return (
@@ -46,16 +47,16 @@ function TimeControl() {
             aria-label="Video progress"
             className="cosmic-time-slider group/timeline pointer-events-auto relative flex h-8 w-full cursor-pointer touch-none select-none items-center outline-none"
         >
-            <TimeSlider.Track className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height,box-shadow] group-data-[active]/timeline:h-1.5 group-data-[focus]/timeline:shadow-[0_0_0_3px_rgba(196,181,253,0.28)]">
+            <TimeSlider.Track className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height] group-data-[active]/timeline:h-1.5">
                 <TimeSlider.Progress className="absolute inset-y-0 left-0 w-[var(--slider-progress)] bg-white/25" />
-                <TimeSlider.TrackFill className="absolute inset-y-0 left-0 w-[var(--slider-fill)] rounded-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.8)]" />
+                <TimeSlider.TrackFill className="absolute inset-y-0 left-0 w-[var(--slider-fill)] rounded-full bg-violet-400" />
             </TimeSlider.Track>
 
-            <TimeSlider.Thumb className="absolute left-[var(--slider-fill)] top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 shadow-[0_0_0_4px_rgba(167,139,250,0.2),0_0_12px_rgba(167,139,250,0.75)] transition-opacity group-data-[active]/timeline:opacity-100 group-data-[dragging]/timeline:scale-110" />
+            <TimeSlider.Thumb className="absolute left-[var(--slider-fill)] top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 transition-opacity group-data-[active]/timeline:opacity-100 group-data-[dragging]/timeline:scale-110" />
 
             <TimeSlider.Preview
                 offset={12}
-                className="cosmic-slider-preview z-50 flex overflow-hidden rounded-lg bg-black/85 opacity-0 shadow-2xl ring-1 ring-white/15 backdrop-blur-xl transition-opacity data-[visible]:opacity-100"
+                className="cosmic-slider-preview z-50 flex overflow-hidden rounded-lg border border-white/10 bg-black/85 opacity-0 backdrop-blur-xl transition-opacity data-[visible]:opacity-100"
             >
                 <TimeSlider.Value
                     type="pointer"
@@ -73,10 +74,10 @@ function VolumeControl() {
             aria-label="Volume"
             className="cosmic-volume-slider group/volume pointer-events-auto relative hidden h-8 w-20 cursor-pointer touch-none select-none items-center outline-none sm:flex"
         >
-            <VolumeSlider.Track className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height,box-shadow] group-data-[active]/volume:h-1.5 group-data-[focus]/volume:shadow-[0_0_0_3px_rgba(196,181,253,0.25)]">
+            <VolumeSlider.Track className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height] group-data-[active]/volume:h-1.5">
                 <VolumeSlider.TrackFill className="absolute inset-y-0 left-0 w-[var(--slider-fill)] rounded-full bg-violet-300" />
             </VolumeSlider.Track>
-            <VolumeSlider.Thumb className="absolute left-[var(--slider-fill)] top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 shadow-[0_0_8px_rgba(196,181,253,0.7)] transition-opacity group-data-[active]/volume:opacity-100" />
+            <VolumeSlider.Thumb className="absolute left-[var(--slider-fill)] top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 transition-opacity group-data-[active]/volume:opacity-100" />
         </VolumeSlider.Root>
     )
 }
@@ -88,7 +89,7 @@ function PlayerControls() {
                 className="pointer-events-none flex flex-1 items-center justify-center"
                 style={{ pointerEvents: "none" }}
             >
-                <PlayButton className="cosmic-play-button pointer-events-auto flex h-16 w-16 items-center justify-center rounded-full bg-black/50 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14),0_16px_40px_rgba(0,0,0,0.45)] outline-none backdrop-blur-xl transition duration-200 hover:scale-105 hover:bg-violet-950/70 active:scale-90 focus-visible:ring-2 focus-visible:ring-violet-300">
+                <PlayButton className="cosmic-play-button pointer-events-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white outline-none backdrop-blur-xl transition duration-200 hover:scale-105 hover:border-white/15 hover:bg-violet-950/70 active:scale-90 focus-visible:border-white/25">
                     <Play className="cosmic-play-icon ml-1 h-7 w-7 fill-current motion-safe:animate-[media-control-feedback_320ms_ease-out]" />
                     <Pause className="cosmic-pause-icon h-7 w-7 fill-current motion-safe:animate-[media-control-feedback_320ms_ease-out]" />
                 </PlayButton>
@@ -128,7 +129,7 @@ function PlayerControls() {
     )
 }
 
-export function VideoPlayer({ media, title, isLoading, onLoadedData, onError }: VideoPlayerProps) {
+export function VideoPlayer({ media, title, onCanPlay, onPlaying, onWaiting, onError }: VideoPlayerProps) {
     const playbackRange = getPlaybackRange(media)
     const fitMode = media.fitMode ?? "cover"
     const label = media.alt || `${title || "Project"} preview video`
@@ -181,7 +182,7 @@ export function VideoPlayer({ media, title, isLoading, onLoadedData, onError }: 
                 title={title || media.alt}
                 ariaLabel={label}
                 playsInline
-                muted
+                muted={true}
                 preload="metadata"
                 load="eager"
                 clipStartTime={playbackRange?.start ?? 0}
@@ -192,7 +193,9 @@ export function VideoPlayer({ media, title, isLoading, onLoadedData, onError }: 
                 data-source={media.url}
                 data-clip-start={playbackRange?.start}
                 data-clip-end={playbackRange?.end}
-                onLoadedData={onLoadedData}
+                onCanPlay={onCanPlay}
+                onPlaying={onPlaying}
+                onWaiting={onWaiting}
                 onError={onError}
                 onPlay={playAmbience}
                 onPause={pauseAmbience}
@@ -201,9 +204,8 @@ export function VideoPlayer({ media, title, isLoading, onLoadedData, onError }: 
             >
                 <MediaProvider
                     className={cn(
-                        "absolute inset-0 h-full w-full transition-opacity duration-300 [&>video]:h-full [&>video]:w-full",
+                        "absolute inset-0 h-full w-full [&>video]:h-full [&>video]:w-full",
                         fitMode === "contain" ? "[&>video]:object-contain" : "[&>video]:object-cover",
-                        isLoading ? "opacity-0" : "opacity-100",
                     )}
                     mediaProps={{
                         "aria-label": label,

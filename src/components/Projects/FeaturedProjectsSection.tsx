@@ -1,62 +1,27 @@
-import gsap from "gsap"
 import { ArrowUpRight } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { AccordionGallery } from "@/components/AccordionGallery"
 import { ButtonLink } from "@/components/Buttons"
 import { ProjectModal } from "@/components/ProjectModal"
 import { getFeaturedProjects } from "@/data/projects"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import type { Project } from "@/types/project"
 
 export function FeaturedProjectsSection() {
-    const sectionRef = useRef<HTMLElement>(null)
-    const headerRef = useRef<HTMLDivElement>(null)
+    const headerRef = useScrollReveal<HTMLDivElement>({
+        selector: "[data-featured-reveal]",
+        y: 36,
+        scale: 0.96,
+        duration: 0.8,
+        stagger: 0.12,
+        threshold: 0.15,
+    })
     const featuredProjects = getFeaturedProjects()
 
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
-    // Scroll reveal animation
-    useEffect(() => {
-        const section = sectionRef.current
-        const header = headerRef.current
-        if (
-            !section ||
-            !header ||
-            typeof window === "undefined" ||
-            !("IntersectionObserver" in window) ||
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ) {
-            return
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry?.isIntersecting) {
-                    gsap.fromTo(
-                        "[data-featured-reveal]",
-                        { opacity: 0, y: 36, scale: 0.96 },
-                        {
-                            opacity: 1,
-                            y: 0,
-                            scale: 1,
-                            duration: 0.8,
-                            stagger: 0.12,
-                            ease: "power3.out",
-                            clearProps: "transform",
-                        },
-                    )
-                }
-            },
-            { threshold: 0.15 },
-        )
-
-        observer.observe(section)
-
-        return () => observer.disconnect()
-    }, [])
-
     return (
         <section
-            ref={sectionRef}
             id="projects"
             aria-labelledby="featured-projects-title"
             className="relative z-20 min-h-screen w-full bg-background px-5 py-24 sm:px-8 sm:py-32 lg:px-12"

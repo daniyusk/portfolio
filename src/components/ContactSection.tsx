@@ -1,10 +1,10 @@
-import gsap from "gsap"
 import { Discord } from "pixelarticons/react/Discord"
 import { Github } from "pixelarticons/react/Github"
 import { Linkedin } from "pixelarticons/react/Linkedin"
 import { Mail } from "pixelarticons/react/Mail"
 import type { CSSProperties } from "react"
-import { useEffect, useMemo, useRef } from "react"
+import { useMemo } from "react"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 
 interface SocialContact {
     name: string
@@ -98,51 +98,17 @@ function SubtleStars() {
 }
 
 export function ContactSection() {
-    const sectionRef = useRef<HTMLElement>(null)
-    const contentRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        const section = sectionRef.current
-        const content = contentRef.current
-        if (
-            !section ||
-            !content ||
-            typeof window === "undefined" ||
-            !("IntersectionObserver" in window) ||
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ) {
-            return
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry?.isIntersecting) {
-                    gsap.fromTo(
-                        "[data-contact-element]",
-                        { opacity: 0, y: 44, scale: 0.94 },
-                        {
-                            opacity: 1,
-                            y: 0,
-                            scale: 1,
-                            duration: 0.95,
-                            stagger: 0.14,
-                            ease: "power3.out",
-                            clearProps: "transform",
-                        },
-                    )
-                }
-            },
-            { threshold: 0.25 },
-        )
-
-        observer.observe(section)
-
-        return () => observer.disconnect()
-    }, [])
+    const contentRef = useScrollReveal<HTMLDivElement>({
+        selector: "[data-contact-element]",
+        y: 44,
+        scale: 0.94,
+        duration: 0.95,
+        stagger: 0.14,
+        threshold: 0.25,
+    })
 
     return (
         <section
-            ref={sectionRef}
             id="contact"
             aria-labelledby="contact-heading"
             className="relative z-20 flex min-h-screen h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 sm:px-6"

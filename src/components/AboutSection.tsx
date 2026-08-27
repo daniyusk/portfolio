@@ -135,7 +135,7 @@ export function AboutSection() {
                                             href="https://premiacao.obmep.org.br/17obmep/verRelatorioPremiadosBronze.do.htm"
                                             target="_blank"
                                             rel="noreferrer"
-                                            aria-label="Official results for the 17th OBMEP"
+                                            aria-label="Official results for the 17th OBMEP (opens in a new tab)"
                                         >
                                             17th
                                             <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
@@ -145,7 +145,7 @@ export function AboutSection() {
                                             href="https://premiacao.obmep.org.br/18obmep/verRelatorioPremiadosGeral-SP.2.do.htm"
                                             target="_blank"
                                             rel="noreferrer"
-                                            aria-label="Official results for the 18th OBMEP"
+                                            aria-label="Official results for the 18th OBMEP (opens in a new tab)"
                                         >
                                             18th
                                             <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
@@ -155,7 +155,7 @@ export function AboutSection() {
                                             href="https://premiacao.obmep.org.br/19obmep/verRelatorioPremiadosBronze.do.htm"
                                             target="_blank"
                                             rel="noreferrer"
-                                            aria-label="Official results for the 19th OBMEP"
+                                            aria-label="Official results for the 19th OBMEP (opens in a new tab)"
                                         >
                                             19th
                                             <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
@@ -174,6 +174,7 @@ export function AboutSection() {
                                         href="https://olimpiadassp.educacao.sp.gov.br/wp-content/uploads/2024/08/Medalhistas-Estaduais-OMASP-novo-1.pdf"
                                         target="_blank"
                                         rel="noreferrer"
+                                        aria-label="Official results for OMASP 2024 (opens in a new tab)"
                                     >
                                         Official results
                                         <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />

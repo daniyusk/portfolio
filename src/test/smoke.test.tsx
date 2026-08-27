@@ -78,5 +78,14 @@ describe("Smoke Tests - Core Components", () => {
         expect(screen.getByText(/bronze · 17th and 19th editions/i)).toBeInTheDocument()
         expect(screen.getByText(/honorable mention · 18th edition/i)).toBeInTheDocument()
         expect(screen.getByText(/state silver medal · 2024/i)).toBeInTheDocument()
+
+        const proofLinks = screen.getAllByRole("link", {
+            name: /official results.*opens in a new tab/i,
+        })
+        expect(proofLinks).toHaveLength(4)
+        for (const link of proofLinks) {
+            expect(link).toHaveAttribute("target", "_blank")
+            expect(link).toHaveAttribute("rel", "noreferrer")
+        }
     })
 })

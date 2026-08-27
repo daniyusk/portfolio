@@ -73,9 +73,10 @@ describe("Smoke Tests - Core Components", () => {
             </MemoryRouter>,
         )
 
-        expect(screen.getByRole("heading", { name: /^about me$/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: /^daniel senzaki$/i })).toBeInTheDocument()
         expect(screen.getAllByText(/cotuca \(unicamp\)/i).length).toBeGreaterThan(0)
-        expect(screen.getByText(/2x bronze medalist/i)).toBeInTheDocument()
-        expect(screen.getByText(/silver medalist/i)).toBeInTheDocument()
+        expect(screen.getByText(/bronze · 17th and 19th editions/i)).toBeInTheDocument()
+        expect(screen.getByText(/honorable mention · 18th edition/i)).toBeInTheDocument()
+        expect(screen.getByText(/state silver medal · 2024/i)).toBeInTheDocument()
     })
 })

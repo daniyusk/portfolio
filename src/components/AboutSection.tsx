@@ -1,6 +1,9 @@
-import { Binary, Cpu, Layers, Terminal } from "lucide-react"
+import { ArrowUpRight, Binary, Layers, Terminal } from "lucide-react"
 import { CotucaLogo, ObmepLogo, OmaspLogo } from "@/components/icons/InstitutionLogos"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
+
+const externalProofLink =
+    "inline-flex min-h-11 items-center gap-1.5 rounded-md px-1 font-jetbrains text-sm font-medium text-violet-200 underline decoration-violet-400/50 underline-offset-4 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-300"
 
 export function AboutSection() {
     const containerRef = useScrollReveal<HTMLDivElement>({
@@ -15,131 +18,187 @@ export function AboutSection() {
         <section
             id="about"
             aria-labelledby="about-heading"
-            className="relative z-20 w-full overflow-hidden bg-background px-5 py-24 sm:px-8 sm:py-32 lg:px-12"
+            className="relative z-20 w-full bg-background px-5 py-24 sm:px-8 sm:py-32 lg:px-12"
         >
-            {/* Ambient cosmic radial glow */}
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(124,58,237,0.06)_0%,transparent_70%)]"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_62%_46%_at_58%_48%,rgba(124,58,237,0.075)_0%,transparent_72%)]"
             />
 
-            <div ref={containerRef} className="relative z-10 mx-auto max-w-6xl">
-                {/* Section Title */}
-                <div data-about-reveal className="mb-10 sm:mb-14">
-                    <h2
-                        id="about-heading"
-                        className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
-                    >
-                        About Me
-                    </h2>
-                </div>
+            <div ref={containerRef} className="relative z-10 mx-auto max-w-7xl">
+                <div className="grid items-start gap-14 lg:grid-cols-[minmax(0,1.12fr)_minmax(22rem,0.88fr)] lg:gap-16 xl:gap-24">
+                    <div data-about-reveal className="min-w-0">
+                        <header className="max-w-3xl">
+                            <h2
+                                id="about-heading"
+                                className="text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl lg:text-6xl"
+                            >
+                                Daniel Senzaki
+                            </h2>
+                            <p className="mt-4 max-w-2xl text-lg font-semibold leading-snug text-violet-200 sm:text-xl">
+                                Systems-focused developer building game systems and reactive interfaces.
+                            </p>
+                        </header>
 
-                {/* Personal Presentation & Bio */}
-                <div data-about-reveal className="space-y-6 sm:space-y-8">
-                    <div>
-                        <h3 className="font-sans text-xl font-bold tracking-tight text-white sm:text-2xl">
-                            Daniel Senzaki
-                        </h3>
-                        <p className="mt-1 font-jetbrains text-xs font-medium text-violet-300">
-                            Full-Stack Systems &amp; Computational Logic
-                        </p>
-                    </div>
+                        <div className="mt-8 max-w-[68ch] space-y-4 text-base leading-7 text-zinc-300">
+                            <p>
+                                I study Informatics and Software Development at{" "}
+                                <span className="font-semibold text-white">COTUCA (UNICAMP)</span>, bringing the
+                                discipline of competitive mathematics to complex software problems.
+                            </p>
+                            <p>
+                                My recent work includes the crafting architecture and reactive UI for{" "}
+                                <span className="font-semibold text-white">Project: FAR</span>, plus a combat-system
+                                refactor for <span className="font-semibold text-white">Steal a Garden</span>.
+                            </p>
+                        </div>
 
-                    <div className="max-w-3xl space-y-4 font-sans text-sm leading-relaxed text-zinc-300 sm:text-base sm:leading-relaxed">
-                        <p>
-                            Currently studying Informatics at{" "}
-                            <span className="font-semibold text-white">COTUCA (UNICAMP)</span>. My engineering
-                            foundation is built on competitive mathematics and algorithmic reasoning, translating
-                            analytical problem-solving into production software.
-                        </p>
-                        <p>
-                            Focused on scalable TypeScript architectures, resilient backend services, and
-                            high-performance user interfaces built for long-term reliability.
-                        </p>
-                    </div>
-
-                    {/* Core Engineering Competencies */}
-                    <div className="pt-2">
                         <ul
                             aria-label="Core competencies and engineering stack"
-                            className="flex flex-wrap gap-2 font-jetbrains text-xs text-zinc-300"
+                            className="mt-8 flex flex-wrap gap-2.5 text-sm text-zinc-200"
                         >
-                            <li className="inline-flex cursor-default items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5">
-                                <Terminal aria-hidden="true" className="h-3.5 w-3.5 text-violet-400" />
-                                <span>TypeScript • React • Node.js</span>
+                            <li className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-2">
+                                <Terminal aria-hidden="true" className="h-4 w-4 shrink-0 text-violet-300" />
+                                <span>TypeScript · React · Node.js</span>
                             </li>
-                            <li className="inline-flex cursor-default items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5">
-                                <Layers aria-hidden="true" className="h-3.5 w-3.5 text-violet-400" />
-                                <span>Systems Architecture &amp; APIs</span>
+                            <li className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-2">
+                                <Layers aria-hidden="true" className="h-4 w-4 shrink-0 text-violet-300" />
+                                <span>Game systems · APIs</span>
                             </li>
-                            <li className="inline-flex cursor-default items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5">
-                                <Binary aria-hidden="true" className="h-3.5 w-3.5 text-violet-400" />
-                                <span>Algorithms &amp; Discrete Math</span>
-                            </li>
-                            <li className="inline-flex cursor-default items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5">
-                                <Cpu aria-hidden="true" className="h-3.5 w-3.5 text-violet-400" />
-                                <span>Reactive UI &amp; Performance</span>
+                            <li className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-2">
+                                <Binary aria-hidden="true" className="h-4 w-4 shrink-0 text-violet-300" />
+                                <span>Reactive UI · Algorithms</span>
                             </li>
                         </ul>
-                    </div>
-                </div>
 
-                {/* Subtle Divider Line */}
-                <div data-about-reveal className="my-10 sm:my-14">
-                    <hr className="border-0 border-t border-white/10" />
-                </div>
-
-                {/* Academic Background & Olympiad Honors */}
-                <div data-about-reveal className="space-y-6 sm:space-y-8">
-                    <h3 className="font-jetbrains text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                        Academic &amp; Olympiad Background
-                    </h3>
-
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {/* COTUCA */}
-                        <div className="flex flex-col space-y-2">
-                            <div className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-2.5">
-                                    <CotucaLogo className="h-5 w-5 shrink-0 text-violet-400" />
-                                    <h4 className="font-sans text-sm font-semibold text-white">COTUCA (UNICAMP)</h4>
+                        <div className="mt-10 max-w-3xl border-t border-white/10 pt-7">
+                            <h3 className="text-base font-bold tracking-tight text-white">Selected work</h3>
+                            <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+                                <div className="min-w-0">
+                                    <dt className="font-jetbrains text-sm font-semibold text-violet-200">
+                                        Project: FAR
+                                    </dt>
+                                    <dd className="mt-1.5 text-sm leading-6 text-zinc-300">
+                                        Crafting architecture, reactive menus, and localized interface states.
+                                    </dd>
                                 </div>
-                                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-jetbrains text-xs font-medium text-emerald-400">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                    Current
-                                </span>
-                            </div>
-                            <p className="font-jetbrains text-xs text-zinc-400">
-                                Informatics &amp; Software Development
-                            </p>
-                            <p className="text-xs leading-relaxed text-zinc-400">
-                                Technical college affiliated with the State University of Campinas.
-                            </p>
-                        </div>
-
-                        {/* OBMEP */}
-                        <div className="flex flex-col space-y-2">
-                            <div className="flex items-center gap-2.5">
-                                <ObmepLogo className="h-5 w-5 shrink-0 text-violet-400" />
-                                <h4 className="font-sans text-sm font-semibold text-white">2x Bronze Medalist</h4>
-                            </div>
-                            <p className="font-jetbrains text-xs text-zinc-400">OBMEP — National Math Olympiad</p>
-                            <p className="text-xs leading-relaxed text-zinc-400">
-                                Brazilian Mathematical Olympiad for Public Schools.
-                            </p>
-                        </div>
-
-                        {/* OMASP */}
-                        <div className="flex flex-col space-y-2">
-                            <div className="flex items-center gap-2.5">
-                                <OmaspLogo className="h-5 w-5 shrink-0 text-violet-400" />
-                                <h4 className="font-sans text-sm font-semibold text-white">Silver Medalist</h4>
-                            </div>
-                            <p className="font-jetbrains text-xs text-zinc-400">OMASP — São Paulo State Olympiad</p>
-                            <p className="text-xs leading-relaxed text-zinc-400">
-                                São Paulo State Math Olympiad analytical distinction.
-                            </p>
+                                <div className="min-w-0">
+                                    <dt className="font-jetbrains text-sm font-semibold text-violet-200">
+                                        Steal a Garden
+                                    </dt>
+                                    <dd className="mt-1.5 text-sm leading-6 text-zinc-300">
+                                        Combat-system refactoring, hit feedback, and player interactions.
+                                    </dd>
+                                </div>
+                            </dl>
                         </div>
                     </div>
+
+                    <aside
+                        data-about-reveal
+                        aria-labelledby="academic-heading"
+                        className="min-w-0 rounded-2xl border border-white/10 bg-zinc-950/55 p-5 sm:p-7 lg:p-8"
+                    >
+                        <h3 id="academic-heading" className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                            Academic proof
+                        </h3>
+
+                        <div className="mt-7 grid grid-cols-[3rem_minmax(0,1fr)] gap-4 sm:grid-cols-[3.5rem_minmax(0,1fr)]">
+                            <CotucaLogo className="h-12 w-12 shrink-0 text-violet-300 sm:h-14 sm:w-14" />
+                            <div className="min-w-0">
+                                <h4 className="text-base font-bold text-white sm:text-lg">COTUCA (UNICAMP)</h4>
+                                <p className="mt-1 text-sm leading-6 text-zinc-300">
+                                    Informatics and Software Development
+                                </p>
+                                <p className="mt-2 font-jetbrains text-sm font-medium text-violet-200">
+                                    Currently studying
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="my-7 h-px bg-white/10" />
+
+                        <div>
+                            <h4 className="text-base font-bold text-white">Olympiad distinctions</h4>
+
+                            <div className="mt-6 grid grid-cols-[3rem_minmax(0,1fr)] gap-4 sm:grid-cols-[3.5rem_minmax(0,1fr)]">
+                                <ObmepLogo className="h-12 w-12 shrink-0 text-violet-300 sm:h-14 sm:w-14" />
+                                <div className="min-w-0">
+                                    <h5 className="text-base font-bold text-white">OBMEP</h5>
+                                    <p className="mt-1 text-sm leading-6 text-zinc-200">
+                                        Bronze · 17th and 19th editions
+                                    </p>
+                                    <p className="text-sm leading-6 text-zinc-300">Honorable mention · 18th edition</p>
+                                    <div className="mt-2 flex flex-wrap gap-x-3">
+                                        <a
+                                            className={externalProofLink}
+                                            href="https://premiacao.obmep.org.br/17obmep/verRelatorioPremiadosBronze.do.htm"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label="Official results for the 17th OBMEP"
+                                        >
+                                            17th
+                                            <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+                                        </a>
+                                        <a
+                                            className={externalProofLink}
+                                            href="https://premiacao.obmep.org.br/18obmep/verRelatorioPremiadosGeral-SP.2.do.htm"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label="Official results for the 18th OBMEP"
+                                        >
+                                            18th
+                                            <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+                                        </a>
+                                        <a
+                                            className={externalProofLink}
+                                            href="https://premiacao.obmep.org.br/19obmep/verRelatorioPremiadosBronze.do.htm"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label="Official results for the 19th OBMEP"
+                                        >
+                                            19th
+                                            <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 grid grid-cols-[3rem_minmax(0,1fr)] gap-4 sm:grid-cols-[3.5rem_minmax(0,1fr)]">
+                                <OmaspLogo className="h-12 w-12 shrink-0 text-violet-300 sm:h-14 sm:w-14" />
+                                <div className="min-w-0">
+                                    <h5 className="text-base font-bold text-white">OMASP</h5>
+                                    <p className="mt-1 text-sm leading-6 text-zinc-200">State silver medal · 2024</p>
+                                    <a
+                                        className={`${externalProofLink} mt-2`}
+                                        href="https://olimpiadassp.educacao.sp.gov.br/wp-content/uploads/2024/08/Medalhistas-Estaduais-OMASP-novo-1.pdf"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        Official results
+                                        <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <div
+                    data-about-reveal
+                    className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between"
+                >
+                    <p className="max-w-2xl text-base leading-7 text-zinc-300">
+                        Have a system or interactive experience to build? I can help turn the idea into working
+                        software.
+                    </p>
+                    <a
+                        href="#contact"
+                        className="inline-flex min-h-12 shrink-0 items-center gap-2 self-start rounded-lg px-1 font-semibold text-violet-200 underline decoration-violet-400/50 underline-offset-4 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-300 sm:self-auto"
+                    >
+                        Let&apos;s talk
+                        <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+                    </a>
                 </div>
             </div>
         </section>

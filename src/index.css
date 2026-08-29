@@ -130,15 +130,3 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
-
-/* Devicon dark mode contrast adjustments */
-.devicon-rust-plain.colored,
-.devicon-rust-original.colored {
-    color: #f74c00 !important;
-}
-
-.devicon-nextjs-plain.colored,
-.devicon-nextjs-original.colored,
-.devicon-unity-plain.colored {
-    color: #ffffff !important;
-}

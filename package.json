@@ -19,13 +19,13 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@icons-pack/react-simple-icons": "^13.15.1",
         "@react-three/fiber": "^9.7.0",
         "@react-three/postprocessing": "^3.0.5",
         "@tailwindcss/vite": "^4.3.0",
         "@vidstack/react": "^1.15.6",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "devicon": "^2.17.0",
         "gsap": "^3.15.0",
         "lucide-react": "^1.17.0",
         "ogl": "^1.0.11",

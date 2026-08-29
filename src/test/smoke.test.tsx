@@ -103,10 +103,10 @@ describe("Smoke Tests - Core Components", () => {
         expect(screen.getByRole("heading", { name: "Tools & Environments" })).toBeInTheDocument()
 
         // Verify key tech badges exist
-        expect(screen.getByText("TypeScript")).toBeInTheDocument()
-        expect(screen.getByText("React")).toBeInTheDocument()
-        expect(screen.getByText("PostgreSQL")).toBeInTheDocument()
-        expect(screen.getByText("Godot")).toBeInTheDocument()
-        expect(screen.getByText("Docker")).toBeInTheDocument()
+        expect(screen.getAllByText("TypeScript").length).toBeGreaterThan(0)
+        expect(screen.getAllByText("React").length).toBeGreaterThan(0)
+        expect(screen.getAllByText("PostgreSQL").length).toBeGreaterThan(0)
+        expect(screen.getAllByText("Godot").length).toBeGreaterThan(0)
+        expect(screen.getAllByText("Docker").length).toBeGreaterThan(0)
     })
 })

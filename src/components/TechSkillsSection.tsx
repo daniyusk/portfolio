@@ -43,9 +43,10 @@ function SkillCategoryCard({ category }: SkillCategoryCardProps) {
                                 className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.18)_0%,transparent_70%)]"
                             />
                             <div className="relative z-10 flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center">
-                                <i
-                                    aria-hidden="true"
-                                    className={`${skill.devicon} text-lg sm:text-xl transition-transform duration-200 group-hover:scale-110`}
+                                <skill.Icon
+                                    size={20}
+                                    color={skill.color ?? "default"}
+                                    className="transition-transform duration-200 group-hover:scale-110"
                                 />
                             </div>
                             <span className="relative z-10 font-jetbrains text-xs font-medium text-zinc-200 transition-colors group-hover:text-white sm:text-sm">

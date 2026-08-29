@@ -1,0 +1,77 @@
+import type { SkillCategory } from "@/types/skills"
+
+export const skillCategories: SkillCategory[] = [
+    {
+        id: "languages",
+        title: "Languages",
+        skills: [
+            { id: "html", name: "HTML5", slug: "html", devicon: "devicon-html5-plain colored" },
+            { id: "css", name: "CSS3", slug: "css", devicon: "devicon-css3-plain colored" },
+            { id: "js", name: "JavaScript", slug: "js", devicon: "devicon-javascript-plain colored" },
+            { id: "ts", name: "TypeScript", slug: "ts", devicon: "devicon-typescript-plain colored" },
+            { id: "python", name: "Python", slug: "python", devicon: "devicon-python-plain colored" },
+            { id: "java", name: "Java", slug: "java", devicon: "devicon-java-plain colored" },
+            { id: "kotlin", name: "Kotlin", slug: "kotlin", devicon: "devicon-kotlin-plain colored" },
+            { id: "c", name: "C", slug: "c", devicon: "devicon-c-plain colored" },
+            { id: "cpp", name: "C++", slug: "cpp", devicon: "devicon-cplusplus-plain colored" },
+            { id: "cs", name: "C#", slug: "cs", devicon: "devicon-csharp-plain colored" },
+            { id: "haxe", name: "Haxe", slug: "haxe", devicon: "devicon-haxe-plain colored" },
+            { id: "lua", name: "Lua", slug: "lua", devicon: "devicon-lua-plain colored" },
+            { id: "rust", name: "Rust", slug: "rust", devicon: "devicon-rust-plain colored" },
+        ],
+    },
+    {
+        id: "frameworks",
+        title: "Frameworks & Libraries",
+        skills: [
+            { id: "nodejs", name: "Node.js", slug: "nodejs", devicon: "devicon-nodejs-plain colored" },
+            { id: "nestjs", name: "NestJS", slug: "nestjs", devicon: "devicon-nestjs-original colored" },
+            { id: "nextjs", name: "Next.js", slug: "nextjs", devicon: "devicon-nextjs-plain colored" },
+            { id: "react", name: "React", slug: "react", devicon: "devicon-react-original colored" },
+            { id: "vite", name: "Vite", slug: "vite", devicon: "devicon-vitejs-plain colored" },
+            { id: "tailwind", name: "Tailwind CSS", slug: "tailwind", devicon: "devicon-tailwindcss-original colored" },
+            { id: "tauri", name: "Tauri", slug: "tauri", devicon: "devicon-tauri-plain colored" },
+            { id: "prisma", name: "Prisma", slug: "prisma", devicon: "devicon-prisma-original colored" },
+            { id: "discordjs", name: "Discord.js", slug: "discordjs", devicon: "devicon-discordjs-plain colored" },
+            { id: "net", name: ".NET", slug: "net", devicon: "devicon-dot-net-plain colored" },
+            { id: "selenium", name: "Selenium", slug: "selenium", devicon: "devicon-selenium-original colored" },
+        ],
+    },
+    {
+        id: "databases",
+        title: "Databases",
+        skills: [
+            { id: "postgres", name: "PostgreSQL", slug: "postgres", devicon: "devicon-postgresql-plain colored" },
+            { id: "mysql", name: "MySQL", slug: "mysql", devicon: "devicon-mysql-plain colored" },
+            { id: "sqlite", name: "SQLite", slug: "sqlite", devicon: "devicon-sqlite-plain colored" },
+            { id: "mongodb", name: "MongoDB", slug: "mongodb", devicon: "devicon-mongodb-plain colored" },
+        ],
+    },
+    {
+        id: "tools",
+        title: "Tools & Environments",
+        skills: [
+            { id: "docker", name: "Docker", slug: "docker", devicon: "devicon-docker-plain colored" },
+            { id: "git", name: "Git", slug: "git", devicon: "devicon-git-plain colored" },
+            { id: "linux", name: "Linux", slug: "linux", devicon: "devicon-linux-plain colored" },
+            { id: "vscode", name: "VS Code", slug: "vscode", devicon: "devicon-vscode-plain colored" },
+            {
+                id: "visualstudio",
+                name: "Visual Studio",
+                slug: "visualstudio",
+                devicon: "devicon-visualstudio-plain colored",
+            },
+            { id: "idea", name: "IntelliJ IDEA", slug: "idea", devicon: "devicon-intellij-plain colored" },
+            {
+                id: "androidstudio",
+                name: "Android Studio",
+                slug: "androidstudio",
+                devicon: "devicon-androidstudio-plain colored",
+            },
+            { id: "eclipse", name: "Eclipse", slug: "eclipse", devicon: "devicon-eclipse-plain colored" },
+            { id: "unity", name: "Unity", slug: "unity", devicon: "devicon-unity-plain colored" },
+            { id: "godot", name: "Godot", slug: "godot", devicon: "devicon-godot-plain colored" },
+            { id: "figma", name: "Figma", slug: "figma", devicon: "devicon-figma-plain colored" },
+        ],
+    },
+]

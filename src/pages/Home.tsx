@@ -8,6 +8,7 @@ import { ContactSection } from "@/components/ContactSection"
 import { Dither } from "@/components/Dither"
 import { ProfileTilt } from "@/components/ProfileTilt"
 import { FeaturedProjectsSection } from "@/components/Projects"
+import { TechSkillsSection } from "@/components/TechSkillsSection"
 import { typography } from "@/components/Typography"
 
 export function Home() {
@@ -141,6 +142,8 @@ export function Home() {
             </div>
 
             <FeaturedProjectsSection />
+
+            <TechSkillsSection />
 
             <AboutSection />
 

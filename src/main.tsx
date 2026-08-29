@@ -9,6 +9,7 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import "@vidstack/react/player/styles/default/theme.css"
+import "devicon/devicon.min.css"
 import "@/index.css"
 import App from "@/App.tsx"
 

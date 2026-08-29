@@ -88,4 +88,25 @@ describe("Smoke Tests - Core Components", () => {
             expect(link).toHaveAttribute("rel", "noreferrer")
         }
     })
+
+    it("renders TechSkillsSection with 4 categories and all key technologies", () => {
+        render(
+            <MemoryRouter>
+                <Home />
+            </MemoryRouter>,
+        )
+
+        expect(screen.getByRole("heading", { name: /technologies & skills/i })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: "Languages" })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: "Frameworks & Libraries" })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: "Databases" })).toBeInTheDocument()
+        expect(screen.getByRole("heading", { name: "Tools & Environments" })).toBeInTheDocument()
+
+        // Verify key tech badges exist
+        expect(screen.getByText("TypeScript")).toBeInTheDocument()
+        expect(screen.getByText("React")).toBeInTheDocument()
+        expect(screen.getByText("PostgreSQL")).toBeInTheDocument()
+        expect(screen.getByText("Godot")).toBeInTheDocument()
+        expect(screen.getByText("Docker")).toBeInTheDocument()
+    })
 })
